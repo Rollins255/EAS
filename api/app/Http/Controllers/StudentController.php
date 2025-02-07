@@ -23,7 +23,7 @@ class StudentController extends Controller
             'department' => ['required'],
             'course' => ['required'],
         ]);
-
+        
         $student = Student::create([
             'name' => $request->name,
             'regNo' => $request->regNo,
@@ -31,8 +31,9 @@ class StudentController extends Controller
             'faculty' => $request->faculty,
             'department' => $request->department,
             'course' => $request->course,
+            'units' => json_encode($request->units),
         ]);
-
+        logger()->info($student);
         return response()->json([
             'student' => $student
         ],200);

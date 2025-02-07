@@ -25,7 +25,7 @@ const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
       <Router-link to="/dashboard/lecturer">Lecturer</Router-link>
     </Button>
     <Button>
-      <Router-link to="/class/attendance">Attendance</Router-link>
+      <Router-link to="/class/setup">Attendance</Router-link>
     </Button>
   </div>
 </template>

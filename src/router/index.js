@@ -38,6 +38,11 @@ const router = createRouter({
       component:()=>import ('@/views/Admin/Learners/NewLearnerView.vue')
     },
     {
+      path:'/student/update',
+      name:'student-update',
+      component:()=>import ('@/views/Admin/Learners/UpdateLearnerView.vue')
+    },
+    {
       path:'/dashboard/lecturer',
       name:'lecturer-dashboard',
       component:()=>import ('@/views/Admin/Lecturer/DashboardView.vue')
@@ -52,13 +57,13 @@ const router = createRouter({
       name:'class-setup',
       component:()=>import ('@/views/Class/SetUpView.vue')
     },
+    // {
+    //   path:'/class/attendance',
+    //   name:'attendance',
+    //   component:()=>import ('@/views/Class/RecognitionView.vue')
+    // },
     {
-      path:'/class/attendance',
-      name:'attendance',
-      component:()=>import ('@/views/Class/RecognitionView.vue')
-    },
-    {
-      path:'/class/attendance/:course',
+      path:'/class/attendance/:f/:d/:c/:u',
       name:'attendance',
       component:()=>import ('@/views/Class/RecognitionView.vue')
     }

@@ -1,76 +1,108 @@
 <template>
     <nav-bar></nav-bar>
+    <Toast />
+    
     <div class="grid grid-cols-2 w-3/4 mx-auto gap-3 my-4">
         <div>
             <span class="font-bold">Faculty:</span>
-            Faculty of science and technology
+            {{ getFaculty(useRoute().params.f) }}
         </div>
         <div>
             <span class="font-bold">Department:</span>
-            Computer Science
+            {{ getDepartment(useRoute().params.f, useRoute().params.d) }}
         </div>
         <div>
             <span class="font-bold">Unit name:</span>
-            Computational theory
+            {{ getUnitName(useRoute().params.f, useRoute().params.d, useRoute().params.c, useRoute().params.u) }}
         </div>
         <div>
             <span class="font-bold">Unit code:</span>
-            COSC 401
+            {{ useRoute().params.u }}
         </div>
     </div>
+    <!-- <p v-if="studentData">{{JSON.parse(studentData[0].facials.descriptors).descriptors }}</p> -->
     <Tabs value="0">
         <TabList>
             <Tab value="0">CLASS ATTENDACE CHECK</Tab>
             <Tab value="1">CLASS LIST</Tab>
         </TabList>
         <TabPanels>
-            <TabPanel  value="0">
+            <TabPanel value="0">
                 <div class="full" v-if="useLoadingStore().loading == '100%'">
                     <div class="text-center text-xl font-serif py-5">
                         <p>Please face the camera and make sure you can see yourself clearly</p>
                     </div>
                     <div class="flex justify-center" v-if="isLive">
                         Live
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="0" fill="#76cd5d"><animate id="svgSpinnersPulseMultiple0" fill="freeze" attributeName="r" begin="0;svgSpinnersPulseMultiple2.end" calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="0;11"/><animate fill="freeze" attributeName="opacity" begin="0;svgSpinnersPulseMultiple2.end" calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="1;0"/></circle><circle cx="12" cy="12" r="0" fill="#76cd5d"><animate id="svgSpinnersPulseMultiple1" fill="freeze" attributeName="r" begin="svgSpinnersPulseMultiple0.begin+0.2s" calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="0;11"/><animate fill="freeze" attributeName="opacity" begin="svgSpinnersPulseMultiple0.begin+0.2s" calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="1;0"/></circle><circle cx="12" cy="12" r="0" fill="#76cd5d"><animate id="svgSpinnersPulseMultiple2" fill="freeze" attributeName="r" begin="svgSpinnersPulseMultiple0.begin+0.4s" calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="0;11"/><animate fill="freeze" attributeName="opacity" begin="svgSpinnersPulseMultiple0.begin+0.4s" calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="1;0"/></circle></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="0" fill="#76cd5d">
+                                <animate id="svgSpinnersPulseMultiple0" fill="freeze" attributeName="r"
+                                    begin="0;svgSpinnersPulseMultiple2.end" calcMode="spline" dur="1.2s"
+                                    keySplines=".52,.6,.25,.99" values="0;11" />
+                                <animate fill="freeze" attributeName="opacity" begin="0;svgSpinnersPulseMultiple2.end"
+                                    calcMode="spline" dur="1.2s" keySplines=".52,.6,.25,.99" values="1;0" />
+                            </circle>
+                            <circle cx="12" cy="12" r="0" fill="#76cd5d">
+                                <animate id="svgSpinnersPulseMultiple1" fill="freeze" attributeName="r"
+                                    begin="svgSpinnersPulseMultiple0.begin+0.2s" calcMode="spline" dur="1.2s"
+                                    keySplines=".52,.6,.25,.99" values="0;11" />
+                                <animate fill="freeze" attributeName="opacity"
+                                    begin="svgSpinnersPulseMultiple0.begin+0.2s" calcMode="spline" dur="1.2s"
+                                    keySplines=".52,.6,.25,.99" values="1;0" />
+                            </circle>
+                            <circle cx="12" cy="12" r="0" fill="#76cd5d">
+                                <animate id="svgSpinnersPulseMultiple2" fill="freeze" attributeName="r"
+                                    begin="svgSpinnersPulseMultiple0.begin+0.4s" calcMode="spline" dur="1.2s"
+                                    keySplines=".52,.6,.25,.99" values="0;11" />
+                                <animate fill="freeze" attributeName="opacity"
+                                    begin="svgSpinnersPulseMultiple0.begin+0.4s" calcMode="spline" dur="1.2s"
+                                    keySplines=".52,.6,.25,.99" values="1;0" />
+                            </circle>
+                        </svg>
                     </div>
                     <div class="relative">
-                        <video 
-                            src="" 
-                            class="mx-auto w-1/2  shadow-xl" 
-                            ref="video" 
-                            autoplay
-                            :class="[labels == 'clarity' 
-                                        ? 'shadow-4xl shadow-blue-400' 
-                                        : labels == 'unknown'
-                                        ?  'shadow-4xl shadow-red-400'
-                                        : 'shadow-4xl shadow-orange-400'  
-                                    ]"
-                        ></video>
-                        <p v-if="labels == 'clarity'" class="text-center py-4 font-bold text-blue-800">PLEASE MAKE SURE YOU CAN SEE YOURSELF CLEARLY</p>
+                        <video src="" class="mx-auto w-1/2  shadow-xl" ref="video" autoplay :class="[labels == 'clarity'
+                            ? 'shadow-4xl shadow-blue-400'
+                            : labels == 'unknown'
+                                ? 'shadow-4xl shadow-red-400'
+                                : 'shadow-4xl shadow-orange-400'
+                        ]"></video>
+                        <p v-if="labels == 'clarity'" class="text-center py-4 font-bold text-blue-800">PLEASE MAKE SURE
+                            YOU CAN SEE YOURSELF CLEARLY</p>
                         <!-- correct macth -->
-                        <div class="absolute top-0 left-0 w-full mx-auto h-full flex flex-col justify-center items-center bg-red-200 bg-opacity-20" v-if="labels != 'unknown' && labels != 'clarity' && labels.length != 0">
-                            <div class="bg-white p-5 m-2">
-                                <p class="text-4xl font-bold ">Kim kimani</p>
-                                <p class="text-4xl font-bold ">EB1/45456/23</p>
+                        <div class="absolute top-0 left-0 w-full mx-auto h-full flex flex-col justify-center items-center bg-red-200 bg-opacity-20"
+                            v-if="labels != 'unknown' && labels != 'clarity' && labels.length != 0">
+                            <div class="bg-blue-300 bg-opacity-45 p-5 m-2 text-center">
+                                <p class="text-4xl font-bold ">{{ labels[0].split('-')[0] }}</p>
+                                <p class="text-2xl font-bold ">{{ labels[0].split('-')[1] }}</p>
+                                <!-- <p>{{ labels[0].split('-') }}</p> -->
                             </div>
-                            <i class="pi pi-thumbs-up-fill text-green-600 font-bold" style="font-size:15rem;"></i>
+                            <i class="pi pi-thumbs-up-fill text-green-600 font-bold  text-sm" style="font-size:12rem;"></i>
                         </div>
                         <!-- false match -->
-                        <div class="absolute top-0 left-0 w-full mx-auto h-full flex flex-col justify-center items-center bg-red-200 bg-opacity-20" v-if="labels == 'unknown'">
+                        <div class="absolute top-0 left-0 w-full mx-auto h-full flex flex-col justify-center items-center bg-red-200 bg-opacity-20"
+                            v-if="labels == 'unknown'">
                             <div class="p-5 m-2  text-center border border-red-600 bg-orange-300">
                                 <p class="text-4xl font-bold ">UNIDENTIFIED</p>
-                                <p class="text-lg font-bold ">please report to the lecturer as asoon as possible . . . </p>
+                                <p class="text-lg font-bold ">please report to the lecturer as asoon as possible . . .
+                                </p>
                             </div>
-                        <i class="pi pi-thumbs-down-fill text-red-600 font-bold" style="font-size:15rem;"></i>
+                            <i class="pi pi-thumbs-down-fill text-red-600 font-bold" style="font-size:13rem;"></i>
                         </div>
                     </div>
                 </div>
                 <div v-else>
-                    <p>loading . . . {{ useLoadingStore().loading  }}</p>
+                    <p class="text-center">loading . . .</p>
+                    <!-- <p>loading . . . {{ useLoadingStore().loading }}</p> -->
+                    <ProgressBar :value="useLoadingStore().loading.split('%')[0]"></ProgressBar>
+                    <div class="w-1/2 mx-auto h-[200px] my-5">
+                        <Skeleton  class="mb-2" borderRadius="16px"></Skeleton>
+                        <Skeleton class="w-[300px]" height="200px"></Skeleton>
+                    </div>
                 </div>
             </TabPanel>
             <TabPanel value="1">
-                <ClassList/>
+                <ClassList :students="studentData" />
             </TabPanel>
         </TabPanels>
     </Tabs>
@@ -78,297 +110,71 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
-import {Tabs,Tab,TabList,TabPanels,TabPanel} from 'primevue'
+import { Tabs, Tab, TabList, TabPanels, TabPanel, Toast,ProgressBar,Skeleton } from 'primevue'
+import { useToast } from 'primevue/usetoast';
 import loadModels from '@/lib/loadModels'
 import * as faceapi from 'face-api.js'
 import { useLoadingStore } from '@/stores/modelLoad';
 import ClassList from '@/components/ClassList.vue'
 import { dtwt } from '@primevue/themes';
+import { useRoute } from 'vue-router';
+import { department, faculty, getCourse, getCourseId, getDepartment, getDepartmentId, getFaculty, getFacultyId, getUnitName } from '@/utils/utils';
+import axiosClient from '@/axios/axios';
+import { useClassListStore } from '@/stores/classList';
+const toast = useToast();
 const video = ref()
 const camera = ref('environment')
 const stream = ref()
 const labels = ref([])
-const sure = ref([]) 
+const sure = ref([])
 const isLive = ref(false)
-const labelFaceDescriptors = ref([
-  {
-    "0": -0.22371529042720795,
-    "1": 0.16117501258850098,
-    "2": 0.14586667716503143,
-    "3": -0.014644255861639977,
-    "4": -0.06491267681121826,
-    "5": -0.09890983253717422,
-    "6": 0.04705275222659111,
-    "7": -0.08370199799537659,
-    "8": 0.0859786719083786,
-    "9": 0.007458524778485298,
-    "10": 0.3097333014011383,
-    "11": -0.05320068821310997,
-    "12": -0.18160918354988098,
-    "13": -0.17415876686573029,
-    "14": 0.0431717224419117,
-    "15": 0.16671104729175568,
-    "16": -0.20101279020309448,
-    "17": -0.12124967575073242,
-    "18": -0.038882605731487274,
-    "19": -0.10093226283788681,
-    "20": 0.04274039342999458,
-    "21": 0.050473131239414215,
-    "22": 0.0015591672854498029,
-    "23": 0.0612342543900013,
-    "24": -0.1405823677778244,
-    "25": -0.3516785204410553,
-    "26": 0.005432071629911661,
-    "27": -0.18225963413715363,
-    "28": -0.011103127151727676,
-    "29": -0.018483081832528114,
-    "30": 0.03851151093840599,
-    "31": 0.12263508141040802,
-    "32": -0.17467260360717773,
-    "33": -0.0223986953496933,
-    "34": -0.027586331591010094,
-    "35": 0.06879379600286484,
-    "36": 0.016584066674113274,
-    "37": 0.02330525778234005,
-    "38": 0.1472070962190628,
-    "39": 0.03473997861146927,
-    "40": -0.1428261697292328,
-    "41": -0.03135799244046211,
-    "42": -0.007326892577111721,
-    "43": 0.31854990124702454,
-    "44": 0.164463609457016,
-    "45": -0.05064373090863228,
-    "46": 0.058930542320013046,
-    "47": 0.031888384371995926,
-    "48": 0.01721123978495598,
-    "49": -0.17778043448925018,
-    "50": -0.03867458179593086,
-    "51": 0.15795041620731354,
-    "52": 0.15894709527492523,
-    "53": 0.016147971153259277,
-    "54": 0.012832279317080975,
-    "55": -0.09539691358804703,
-    "56": -0.02722574584186077,
-    "57": 0.0008885158458724618,
-    "58": -0.16251257061958313,
-    "59": 0.03014533407986164,
-    "60": 0.06782107800245285,
-    "61": -0.1040850356221199,
-    "62": -0.068292535841465,
-    "63": -0.07456642389297485,
-    "64": 0.2955169081687927,
-    "65": 0.08763383328914642,
-    "66": -0.13436934351921082,
-    "67": -0.043413400650024414,
-    "68": 0.1209988072514534,
-    "69": -0.05617130175232887,
-    "70": -0.11482603847980499,
-    "71": 0.04703231155872345,
-    "72": -0.1903112381696701,
-    "73": -0.10419297218322754,
-    "74": -0.29179322719573975,
-    "75": 0.06536469608545303,
-    "76": 0.34143370389938354,
-    "77": 0.033565912395715714,
-    "78": -0.26717257499694824,
-    "79": -0.04370539262890816,
-    "80": -0.1843196004629135,
-    "81": 0.06565237045288086,
-    "82": 0.04177865758538246,
-    "83": 0.055974703282117844,
-    "84": -0.07714933902025223,
-    "85": 0.01968850940465927,
-    "86": -0.12194159626960754,
-    "87": -0.00070215854793787,
-    "88": 0.14478319883346558,
-    "89": -0.029004700481891632,
-    "90": -0.0574607290327549,
-    "91": 0.21580642461776733,
-    "92": 0.0032160882838070393,
-    "93": -0.006635753437876701,
-    "94": 0.004764012061059475,
-    "95": -0.07190735638141632,
-    "96": 0.012185187079012394,
-    "97": -0.045714132487773895,
-    "98": -0.06358944624662399,
-    "99": -0.04658844694495201,
-    "100": 0.017942694947123528,
-    "101": -0.12799331545829773,
-    "102": -0.02477194368839264,
-    "103": 0.08584219962358475,
-    "104": -0.22218261659145355,
-    "105": 0.08355247974395752,
-    "106": 0.053677819669246674,
-    "107": 0.05279431492090225,
-    "108": -0.0028249777387827635,
-    "109": 0.06622542440891266,
-    "110": -0.0978817269206047,
-    "111": -0.05578506365418434,
-    "112": 0.14095555245876312,
-    "113": -0.16501674056053162,
-    "114": 0.2176981270313263,
-    "115": 0.19430877268314362,
-    "116": -0.008697603829205036,
-    "117": 0.12066488713026047,
-    "118": 0.059175778180360794,
-    "119": 0.04685187712311745,
-    "120": -0.12140531092882156,
-    "121": -0.01825987547636032,
-    "122": -0.04816178232431412,
-    "123": -0.03844811022281647,
-    "124": 0.10758540779352188,
-    "125": -0.024122634902596474,
-    "126": 0.05616055428981781,
-    "127": 0.019751517102122307
-  },
-  {
-    "0": -0.17132602632045746,
-    "1": 0.09874919801950455,
-    "2": 0.1314130276441574,
-    "3": -0.04003976285457611,
-    "4": -0.051823657006025314,
-    "5": -0.15405812859535217,
-    "6": 0.009013371542096138,
-    "7": -0.09188390523195267,
-    "8": 0.05194136127829552,
-    "9": -0.005179616156965494,
-    "10": 0.3088558614253998,
-    "11": -0.05413753539323807,
-    "12": -0.19832617044448853,
-    "13": -0.19090847671031952,
-    "14": 0.05685079097747803,
-    "15": 0.12607286870479584,
-    "16": -0.11921314150094986,
-    "17": -0.14111803472042084,
-    "18": -0.004982453770935535,
-    "19": -0.10736030340194702,
-    "20": 0.09890526533126831,
-    "21": 0.03787251561880112,
-    "22": 0.012674331665039062,
-    "23": 0.055013589560985565,
-    "24": -0.13737918436527252,
-    "25": -0.3334245979785919,
-    "26": -0.041733890771865845,
-    "27": -0.17359605431556702,
-    "28": -0.046476103365421295,
-    "29": -0.037771664559841156,
-    "30": 0.03399528190493584,
-    "31": 0.12063132226467133,
-    "32": -0.19877125322818756,
-    "33": -0.0395251139998436,
-    "34": -0.03251988813281059,
-    "35": 0.09794049710035324,
-    "36": -0.0009355097427032888,
-    "37": 0.018674394115805626,
-    "38": 0.09249981492757797,
-    "39": 0.057136420160532,
-    "40": -0.13165433704853058,
-    "41": 0.0015987680526450276,
-    "42": -0.017622793093323708,
-    "43": 0.30032745003700256,
-    "44": 0.2111060917377472,
-    "45": -0.020282786339521408,
-    "46": 0.04013825207948685,
-    "47": 0.045449934899806976,
-    "48": -0.009029215201735497,
-    "49": -0.19921846687793732,
-    "50": -0.015468982979655266,
-    "51": 0.14801277220249176,
-    "52": 0.17710761725902557,
-    "53": 0.028617829084396362,
-    "54": 0.04796783626079559,
-    "55": -0.05465061217546463,
-    "56": -0.00036207487573847175,
-    "57": 0.009793287143111229,
-    "58": -0.18995334208011627,
-    "59": 0.032424040138721466,
-    "60": 0.05544048175215721,
-    "61": -0.1030927374958992,
-    "62": -0.060495540499687195,
-    "63": -0.10439459979534149,
-    "64": 0.26955172419548035,
-    "65": 0.06547599285840988,
-    "66": -0.15365758538246155,
-    "67": 0.010746409185230732,
-    "68": 0.1231260672211647,
-    "69": -0.08305572718381882,
-    "70": -0.15197528898715973,
-    "71": 0.04563378170132637,
-    "72": -0.2083907127380371,
-    "73": -0.1153344139456749,
-    "74": -0.30861493945121765,
-    "75": 0.09141623973846436,
-    "76": 0.3117779493331909,
-    "77": 0.06384897977113724,
-    "78": -0.2511686384677887,
-    "79": -0.023753365501761436,
-    "80": -0.12948498129844666,
-    "81": 0.08765054494142532,
-    "82": 0.0022513954900205135,
-    "83": 0.027594665065407753,
-    "84": -0.0349612720310688,
-    "85": 0.006766303908079863,
-    "86": -0.12401735782623291,
-    "87": 0.009488559328019619,
-    "88": 0.1086161658167839,
-    "89": -0.04260965809226036,
-    "90": -0.04174116253852844,
-    "91": 0.23685796558856964,
-    "92": -0.04092824459075928,
-    "93": 0.048589400947093964,
-    "94": 0.00733633479103446,
-    "95": -0.018958618864417076,
-    "96": 0.015418240800499916,
-    "97": -0.05067907273769379,
-    "98": -0.0684305801987648,
-    "99": -0.03503028675913811,
-    "100": -0.003475208068266511,
-    "101": -0.1349545419216156,
-    "102": -0.039262138307094574,
-    "103": 0.09932312369346619,
-    "104": -0.18500617146492004,
-    "105": 0.07416209578514099,
-    "106": 0.021342990919947624,
-    "107": 0.039828862994909286,
-    "108": -0.03652908280491829,
-    "109": 0.052412841469049454,
-    "110": -0.07125037908554077,
-    "111": -0.053401365876197815,
-    "112": 0.07978518307209015,
-    "113": -0.18258549273014069,
-    "114": 0.2054540365934372,
-    "115": 0.228228360414505,
-    "116": 0.0022399239242076874,
-    "117": 0.09004668146371841,
-    "118": 0.029377829283475876,
-    "119": 0.015530021861195564,
-    "120": -0.11156240105628967,
-    "121": -0.06168540567159653,
-    "122": -0.09668777883052826,
-    "123": -0.05573832988739014,
-    "124": 0.07036159932613373,
-    "125": 0.0023962180130183697,
-    "126": 0.008578173816204071,
-    "127": 0.034722451120615005
-  }
-])
-onMounted(async()=>{
+const studentData = ref([])
+const isDataReady = ref(false)
+const courseData = ref()
+const labelFaceDescriptors = ref()
+onMounted(async () => {
+    await getStudents()
     await loadModels()
     await startStream()
     faceRecognition()
 })
-onUnmounted(()=>{
+onUnmounted(() => {
     video.value = null
-    stream.value.getTracks().forEach(track=>{
+    stream.value.getTracks().forEach(track => {
         track.stop()
     })
 })
-const startStream = async()=>{
+const getStudents = async () => {
+    courseData.value = {
+        faculty: getFacultyId(getFaculty(useRoute().params.f)),
+        department: getDepartmentId(
+            getFaculty(useRoute().params.f),
+            getDepartment(useRoute().params.f, useRoute().params.d)
+        ),
+        course: getCourseId(
+            getFaculty(useRoute().params.f),
+            getDepartment(useRoute().params.f, useRoute().params.d),
+            getCourse(useRoute().params.f, useRoute().params.d, useRoute().params.c)
+        )
+    }
+    await axiosClient.post('/get-students', courseData.value)
+        .then(res => {
+            isDataReady.value = true
+            studentData.value = res.data
+            useClassListStore().setClassList(res.data)
+            // console.log(JSON.parse(res.data[0].facials.descriptors).descriptors)
+        })
+        .catch(err => {
+            isDataReady.value = true
+            console.error(err)
+        })
+}
+const startStream = async () => {
     stream.value = await navigator.mediaDevices.getUserMedia(
         {
-            video:{
-                facingMode:{
-                    ideal:camera.value
+            video: {
+                facingMode: {
+                    ideal: camera.value
                 }
             }
         }
@@ -376,307 +182,77 @@ const startStream = async()=>{
     video.value.srcObject = stream.value
     console.log('video stream has started')
 }
-const faceRecognition = async()=>{
-    const img = await faceapi.fetchImage('/mw1.jpeg')
-    // console.log(img)
-    const dt = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
-    let faceData = ref([
-        {
-            "0": -0.22371529042720795,
-            "1": 0.16117501258850098,
-            "2": 0.14586667716503143,
-            "3": -0.014644255861639977,
-            "4": -0.06491267681121826,
-            "5": -0.09890983253717422,
-            "6": 0.04705275222659111,
-            "7": -0.08370199799537659,
-            "8": 0.0859786719083786,
-            "9": 0.007458524778485298,
-            "10": 0.3097333014011383,
-            "11": -0.05320068821310997,
-            "12": -0.18160918354988098,
-            "13": -0.17415876686573029,
-            "14": 0.0431717224419117,
-            "15": 0.16671104729175568,
-            "16": -0.20101279020309448,
-            "17": -0.12124967575073242,
-            "18": -0.038882605731487274,
-            "19": -0.10093226283788681,
-            "20": 0.04274039342999458,
-            "21": 0.050473131239414215,
-            "22": 0.0015591672854498029,
-            "23": 0.0612342543900013,
-            "24": -0.1405823677778244,
-            "25": -0.3516785204410553,
-            "26": 0.005432071629911661,
-            "27": -0.18225963413715363,
-            "28": -0.011103127151727676,
-            "29": -0.018483081832528114,
-            "30": 0.03851151093840599,
-            "31": 0.12263508141040802,
-            "32": -0.17467260360717773,
-            "33": -0.0223986953496933,
-            "34": -0.027586331591010094,
-            "35": 0.06879379600286484,
-            "36": 0.016584066674113274,
-            "37": 0.02330525778234005,
-            "38": 0.1472070962190628,
-            "39": 0.03473997861146927,
-            "40": -0.1428261697292328,
-            "41": -0.03135799244046211,
-            "42": -0.007326892577111721,
-            "43": 0.31854990124702454,
-            "44": 0.164463609457016,
-            "45": -0.05064373090863228,
-            "46": 0.058930542320013046,
-            "47": 0.031888384371995926,
-            "48": 0.01721123978495598,
-            "49": -0.17778043448925018,
-            "50": -0.03867458179593086,
-            "51": 0.15795041620731354,
-            "52": 0.15894709527492523,
-            "53": 0.016147971153259277,
-            "54": 0.012832279317080975,
-            "55": -0.09539691358804703,
-            "56": -0.02722574584186077,
-            "57": 0.0008885158458724618,
-            "58": -0.16251257061958313,
-            "59": 0.03014533407986164,
-            "60": 0.06782107800245285,
-            "61": -0.1040850356221199,
-            "62": -0.068292535841465,
-            "63": -0.07456642389297485,
-            "64": 0.2955169081687927,
-            "65": 0.08763383328914642,
-            "66": -0.13436934351921082,
-            "67": -0.043413400650024414,
-            "68": 0.1209988072514534,
-            "69": -0.05617130175232887,
-            "70": -0.11482603847980499,
-            "71": 0.04703231155872345,
-            "72": -0.1903112381696701,
-            "73": -0.10419297218322754,
-            "74": -0.29179322719573975,
-            "75": 0.06536469608545303,
-            "76": 0.34143370389938354,
-            "77": 0.033565912395715714,
-            "78": -0.26717257499694824,
-            "79": -0.04370539262890816,
-            "80": -0.1843196004629135,
-            "81": 0.06565237045288086,
-            "82": 0.04177865758538246,
-            "83": 0.055974703282117844,
-            "84": -0.07714933902025223,
-            "85": 0.01968850940465927,
-            "86": -0.12194159626960754,
-            "87": -0.00070215854793787,
-            "88": 0.14478319883346558,
-            "89": -0.029004700481891632,
-            "90": -0.0574607290327549,
-            "91": 0.21580642461776733,
-            "92": 0.0032160882838070393,
-            "93": -0.006635753437876701,
-            "94": 0.004764012061059475,
-            "95": -0.07190735638141632,
-            "96": 0.012185187079012394,
-            "97": -0.045714132487773895,
-            "98": -0.06358944624662399,
-            "99": -0.04658844694495201,
-            "100": 0.017942694947123528,
-            "101": -0.12799331545829773,
-            "102": -0.02477194368839264,
-            "103": 0.08584219962358475,
-            "104": -0.22218261659145355,
-            "105": 0.08355247974395752,
-            "106": 0.053677819669246674,
-            "107": 0.05279431492090225,
-            "108": -0.0028249777387827635,
-            "109": 0.06622542440891266,
-            "110": -0.0978817269206047,
-            "111": -0.05578506365418434,
-            "112": 0.14095555245876312,
-            "113": -0.16501674056053162,
-            "114": 0.2176981270313263,
-            "115": 0.19430877268314362,
-            "116": -0.008697603829205036,
-            "117": 0.12066488713026047,
-            "118": 0.059175778180360794,
-            "119": 0.04685187712311745,
-            "120": -0.12140531092882156,
-            "121": -0.01825987547636032,
-            "122": -0.04816178232431412,
-            "123": -0.03844811022281647,
-            "124": 0.10758540779352188,
-            "125": -0.024122634902596474,
-            "126": 0.05616055428981781,
-            "127": 0.019751517102122307
-        },
-        {
-            "0": -0.17132602632045746,
-            "1": 0.09874919801950455,
-            "2": 0.1314130276441574,
-            "3": -0.04003976285457611,
-            "4": -0.051823657006025314,
-            "5": -0.15405812859535217,
-            "6": 0.009013371542096138,
-            "7": -0.09188390523195267,
-            "8": 0.05194136127829552,
-            "9": -0.005179616156965494,
-            "10": 0.3088558614253998,
-            "11": -0.05413753539323807,
-            "12": -0.19832617044448853,
-            "13": -0.19090847671031952,
-            "14": 0.05685079097747803,
-            "15": 0.12607286870479584,
-            "16": -0.11921314150094986,
-            "17": -0.14111803472042084,
-            "18": -0.004982453770935535,
-            "19": -0.10736030340194702,
-            "20": 0.09890526533126831,
-            "21": 0.03787251561880112,
-            "22": 0.012674331665039062,
-            "23": 0.055013589560985565,
-            "24": -0.13737918436527252,
-            "25": -0.3334245979785919,
-            "26": -0.041733890771865845,
-            "27": -0.17359605431556702,
-            "28": -0.046476103365421295,
-            "29": -0.037771664559841156,
-            "30": 0.03399528190493584,
-            "31": 0.12063132226467133,
-            "32": -0.19877125322818756,
-            "33": -0.0395251139998436,
-            "34": -0.03251988813281059,
-            "35": 0.09794049710035324,
-            "36": -0.0009355097427032888,
-            "37": 0.018674394115805626,
-            "38": 0.09249981492757797,
-            "39": 0.057136420160532,
-            "40": -0.13165433704853058,
-            "41": 0.0015987680526450276,
-            "42": -0.017622793093323708,
-            "43": 0.30032745003700256,
-            "44": 0.2111060917377472,
-            "45": -0.020282786339521408,
-            "46": 0.04013825207948685,
-            "47": 0.045449934899806976,
-            "48": -0.009029215201735497,
-            "49": -0.19921846687793732,
-            "50": -0.015468982979655266,
-            "51": 0.14801277220249176,
-            "52": 0.17710761725902557,
-            "53": 0.028617829084396362,
-            "54": 0.04796783626079559,
-            "55": -0.05465061217546463,
-            "56": -0.00036207487573847175,
-            "57": 0.009793287143111229,
-            "58": -0.18995334208011627,
-            "59": 0.032424040138721466,
-            "60": 0.05544048175215721,
-            "61": -0.1030927374958992,
-            "62": -0.060495540499687195,
-            "63": -0.10439459979534149,
-            "64": 0.26955172419548035,
-            "65": 0.06547599285840988,
-            "66": -0.15365758538246155,
-            "67": 0.010746409185230732,
-            "68": 0.1231260672211647,
-            "69": -0.08305572718381882,
-            "70": -0.15197528898715973,
-            "71": 0.04563378170132637,
-            "72": -0.2083907127380371,
-            "73": -0.1153344139456749,
-            "74": -0.30861493945121765,
-            "75": 0.09141623973846436,
-            "76": 0.3117779493331909,
-            "77": 0.06384897977113724,
-            "78": -0.2511686384677887,
-            "79": -0.023753365501761436,
-            "80": -0.12948498129844666,
-            "81": 0.08765054494142532,
-            "82": 0.0022513954900205135,
-            "83": 0.027594665065407753,
-            "84": -0.0349612720310688,
-            "85": 0.006766303908079863,
-            "86": -0.12401735782623291,
-            "87": 0.009488559328019619,
-            "88": 0.1086161658167839,
-            "89": -0.04260965809226036,
-            "90": -0.04174116253852844,
-            "91": 0.23685796558856964,
-            "92": -0.04092824459075928,
-            "93": 0.048589400947093964,
-            "94": 0.00733633479103446,
-            "95": -0.018958618864417076,
-            "96": 0.015418240800499916,
-            "97": -0.05067907273769379,
-            "98": -0.0684305801987648,
-            "99": -0.03503028675913811,
-            "100": -0.003475208068266511,
-            "101": -0.1349545419216156,
-            "102": -0.039262138307094574,
-            "103": 0.09932312369346619,
-            "104": -0.18500617146492004,
-            "105": 0.07416209578514099,
-            "106": 0.021342990919947624,
-            "107": 0.039828862994909286,
-            "108": -0.03652908280491829,
-            "109": 0.052412841469049454,
-            "110": -0.07125037908554077,
-            "111": -0.053401365876197815,
-            "112": 0.07978518307209015,
-            "113": -0.18258549273014069,
-            "114": 0.2054540365934372,
-            "115": 0.228228360414505,
-            "116": 0.0022399239242076874,
-            "117": 0.09004668146371841,
-            "118": 0.029377829283475876,
-            "119": 0.015530021861195564,
-            "120": -0.11156240105628967,
-            "121": -0.06168540567159653,
-            "122": -0.09668777883052826,
-            "123": -0.05573832988739014,
-            "124": 0.07036159932613373,
-            "125": 0.0023962180130183697,
-            "126": 0.008578173816204071,
-            "127": 0.034722451120615005
-        }
-    ])
-    let flaotArr = []
-    let arr = []
-            dt.descriptor.forEach((el)=>{
-                // faceData.value.forEach((el)=>{
-                arr = [] 
-                for(let i = 0; i < 128; i++){
+
+const faceRecognition = async () => {
+    if (studentData.value.length > 0) {
+        let flaotArr = []
+        let arr = []
+        labelFaceDescriptors.value = await Promise.all(studentData.value.map(async (element) => { 
+            let data = JSON.parse(element.facials.descriptors)
+            flaotArr = []
+            data.descriptors.forEach((el) => {
+                arr = []
+                for (let i = 0; i < 128; i++) {
                     arr.push(el[i])
                 }
                 flaotArr.push(new Float32Array(arr))
-                arr = []                 
+                arr = []
             })
-    let testImg = new  faceapi.LabeledFaceDescriptors('match',flaotArr)
-    const faceMatcher = new faceapi.FaceMatcher(testImg)
-    setInterval(async()=>{ 
-        if(video.value == null){
+            return new faceapi.LabeledFaceDescriptors(data.label, flaotArr)
+        }))
+    }
+    const faceMatcher = new faceapi.FaceMatcher(labelFaceDescriptors.value)
+    setInterval(async () => {
+        if (video.value == null) {
             clearInterval()
             return;
         }
         isLive.value = true
         console.log('getting the face')
-        const detections = await faceapi.detectAllFaces(video.value,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+        const detections = await faceapi.detectAllFaces(video.value, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
 
-        if(detections.length > 0){
+        if (detections.length > 0) {
             labels.value = []
             sure.value = []
             const bestMatch = faceMatcher.findBestMatch(detections[0].descriptor)
             labels.value.push(bestMatch['_label'])
             sure.value.push(bestMatch['_distance'])
             console.log(bestMatch)
-        }else{
+            if (bestMatch['_label'] != 'unknown') {
+                markAttendance(bestMatch['_label'])
+            }
+        } else {
             labels.value = []
             sure.value = []
             labels.value.push('clarity')
         }
-    
-    },2000)
+
+    }, 2000)
 }
+
+const markAttendance = (value) => {
+    let user = {
+        data: courseData.value,
+        regNo: value.split('-')[1],
+        lecture: 1
+    }
+    axiosClient.post('/mark-attendance', user)
+        .then(res => {
+
+            if (res.data.message == 'present') {
+                show('success','PRESENT',res.data.student[0].name +" "+ res.data.student[0].regNo)
+                studentData.value = res.data.list
+                useClassListStore().setClassList(res.data.list)
+            } else if (res.data.message == 'already present') {
+                show('info','ALREADY PRESENT',res.data.student[0].name +" "+ res.data.student[0].regNo)
+                studentData.value = res.data.list
+                useClassListStore().setClassList(res.data.list)
+            }
+        })
+}
+
+function show(severity,summary,detail) {
+    toast.add({ severity: severity, summary: summary, detail: detail, life: 5000 });
+}
+
 </script>

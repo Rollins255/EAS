@@ -16,9 +16,11 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::post('/logout',[LoginController::class,'logout']);
     Route::post('/register-student',[StudentController::class,'create']);
     Route::post('/get-student',[StudentController::class,'student']);
+    Route::post('/get-students',[LectureController::class,'start']);
     Route::post('facial-data',[StudentController::class,'facials']);
 
     Route::post('/set-class',[LectureController::class,'create']);
+    Route::post('/mark-attendance',[LectureController::class,'mark']);
 });
 
 

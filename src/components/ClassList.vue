@@ -1,4 +1,5 @@
 <template>
+    <!-- {{ students }} -->
     <div class="card">
         <DataTable :value="data" show-gridlines="true" striped-rows="true" paginator :rows="50" :rowsPerPageOptions="[ 50,100,1000]" sortMode="multiple">
             <Column field="reg" sortable="true" header="Reg. No"></Column>
@@ -15,21 +16,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref,watch } from 'vue';
 import { DataTable,Column } from 'primevue';
-const data =  ref([
-
-    {
-        name:'Kim Kimani',
-        reg:'EB2/34567/23',
-        time:'11:03',
-        inClass:true
-    },
-    {
-        name:'Kim Kimani',
-        reg:'EB2/34567/23',
-        time:'11:03',
-        inClass:false
-    }
-])
+const {students} = defineProps({students:Array})
+const data =  ref([])
+watch(()=>students,()=>{
+    console.log(students)
+    data.value = []
+    students.forEach(el=>{
+        data.value.push({
+            name:el.name,
+            reg:el.regNo,
+            time:'11:03',
+            inClass:el.present
+        })
+    })
+})
 </script>

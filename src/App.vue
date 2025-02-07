@@ -1,6 +1,11 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Button from 'primevue/button'
+import { onUnmounted } from 'vue';
+
+onUnmounted(()=>{
+  localStorage.clear()
+})
 </script>
 
 <template>
