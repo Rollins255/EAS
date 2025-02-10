@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('lecture');
             $table->string('student');
+            $table->string('clockIn');
             $table->timestamps();
         });
     }

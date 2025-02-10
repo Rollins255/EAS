@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('department');
             $table->unsignedBigInteger('course');
             $table->json('units')->nullable();
+            $table->string('password');
             $table->timestamps();
         });
     }

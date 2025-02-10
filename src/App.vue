@@ -9,7 +9,7 @@ onUnmounted(()=>{
 </script>
 
 <template>
-  <div class="w-screen">
+  <div>
     <RouterView />
   </div>
 </template>

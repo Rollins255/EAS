@@ -4,14 +4,14 @@
         <h1 class="font-bold text-center text-3xl py-4 font-serif">REGISTER LEARNER</h1>
     </div>
     <div class="w-2/3 mx-auto">
-        <Stepper value="1">
+        <Stepper v-model:value="tab_value">
             <StepList>
                 <Step value="1">REGISTARTION FORM</Step>
                 <Step value="2">FACIALS REGISTARTION</Step>
             </StepList>
             <StepPanels>
                 <StepPanel v-slot="{ activateCallback }" value="1">
-                    <RegistarionForm/>
+                    <RegistarionForm @value = setValue />
                     <div class="flex pt-6 justify-end">
                         <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="activateCallback('2')" />
                     </div>
@@ -34,4 +34,9 @@ import { Stepper,StepList,StepPanels,StepItem,Step,StepPanel } from 'primevue';
 import RegistarionForm from '@/components/RegistarionForm.vue';
 import FaceRegistration from '@/components/FaceRegistration.vue';
 import { useStudentStore } from '@/stores/student';
+import {ref} from 'vue'
+const tab_value  = ref("1")
+function setValue(){
+    tab_value.value = "2"
+}
 </script>

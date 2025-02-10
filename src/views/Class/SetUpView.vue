@@ -1,7 +1,7 @@
 <template>
     <nav-bar/>
     <div class="h-[90vh] w-full">
-        <!-- {{ faculties }} -->
+        
         <div class="card flex justify-center">
             <Breadcrumb :home="home" :model="items">
                 <template #item="{ item,props }">
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="grid grid-cols-3 gap-3 m-5" v-if="units">
-            <div class="bg-green-200 hover:bg-green-400 rounded cursor-pointer h-[30vh] flex items-center justify-center
+            <div class="bg-green-400 hover:bg-green-600 rounded cursor-pointer h-[30vh] flex items-center justify-center
              text-center"
                 @click="unitSelect(unit)"
                 v-for="unit in units"
@@ -61,6 +61,7 @@ const units = ref()
 import { Breadcrumb } from 'primevue'
 import router from '@/router';
 import * as utils from '@/utils/utils'
+import axiosClient from '@/axios/axios'
 const home = ref({
     icon: 'pi pi-home'
 });
@@ -96,15 +97,29 @@ function courseSelect(value){
     courses.value.forEach(el=>{
         if(value.label == el.label){
             items.value[2] = {label:el,tag:'c'}
-            units.value = el.units
+            // units.value = el.units
         }
     })
+    let data = {
+       'f':items.value[0].label.id,
+       'd':items.value[1].label.id,
+       'c':items.value[2].label.id,
+    }
+    axiosClient.post('/units/',data)
+    .then(res=>{
+        console.log(res.data)
+        units.value = res.data.units
+    })
+    .catch(err=>{
+        console.error(err)
+    })
+    
 
     // router.replace('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+value)
 }
 function unitSelect(value){
     // console.log(value)
-    router.replace('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+items.value[2].label.label_tag+"/"+value.code)
+    router.push('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+items.value[2].label.label_tag+"/"+value.code+"?name="+value.name)
 }
 
 function navPress(value){

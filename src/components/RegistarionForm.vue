@@ -28,7 +28,7 @@
                 <!-- <InputText id="on_label" class="w-full  my-5" required v-model="user.course"  autocomplete="off" /> -->
                 <label for="on_label">Course</label>
             </FloatLabel>
-            <div class="flex justify-center w-4/5  mx-auto">
+            <div class="flex justify-center w-4/5  mx-auto" v-if="!isSubmitting">
                 <Button type="submit" class=" w-1/2 mx-auto">R E G I S T E R</Button>
             </div>
         </form>
@@ -42,6 +42,8 @@ import axiosClient from '@/axios/axios';
 import { useStudentStore } from '@/stores/student';
 import { getCourseId, getCourses, getDepartmentId, getDepartments, getFaculties, getFacultyId } from '@/utils/utils';
 const toast = useToast();
+const emit = defineEmits(['value'])
+const isSubmitting = ref(false)
 const user = ref({
     name:'',
     regNo:'',
@@ -52,14 +54,6 @@ const user = ref({
 })
 
 const faculties = ref(getFaculties());
-// const faculties = ref([
-//     { name: 'FACULTY OF SCIENCES AND TECHNOLOGY', code: 'FST', id: 1 },
-//     { name: 'FACULTY OF ENGINEERING', code: 'FET', id: 2 },
-//     { name: 'School of Nursing and Public Health', code: 'SNPH', id: 3 },
-//     { name: 'Faculty of Education and Resources Development', code: 'FERD', id: 4 },
-//     { name: 'Faculty of Business Studies', code: 'FBUS', id: 5 },
-//     { name: 'Faculty of Agriculture and Environmental Studies', code: 'FAGRI', id: 6 },
-// ]);
 const department = ref()
 const dept_FST = ref([
     { name: 'biological sciences', code: 'bio', id: 1 },
@@ -99,6 +93,7 @@ const formError = () => {
     toast.add({ severity: 'error', summary: 'Form Error', detail: 'Please fill the form correctly', life: 5000 });
 };
 function onSubmit(){
+    isSubmitting.value = true
     if(
         user.value.faculty == null ||
         user.value.department == null ||
@@ -109,7 +104,7 @@ function onSubmit(){
     }
     let data = {
         name:user.value.name,
-        regNo:user.value.regNo,
+        regNo:user.value.regNo.toUpperCase(),
         idNo:user.value.idNo,
         faculty:getFacultyId(user.value.faculty),
         department:getDepartmentId(user.value.faculty,user.value.department),
@@ -125,11 +120,19 @@ function onSubmit(){
             'faculty':res.data.student.faculty,
             'department':res.data.student.department,
             'course':res.data.student.course,
-            
         }
+        isSubmitting.value = false
+        emit('value')
         useStudentStore().setStudent(student)
+        user.value.name = null
+        user.value.regNo = null
+        user.value.idNo = null
+        user.value.faculty = null
+        user.value.department = null
+        user.value.course = null
     })
     .catch(err=>{
+        isSubmitting.value = false
         console.error(err)
     })
 }

@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Sanctum\HasApiTokens;
 
 class Lecturer extends Model
 {
+    use HasApiTokens;
     //
-    protected $fillabel = [
+    protected $fillable = [
         'name',
         'staffNo',
         'idNo',
@@ -17,4 +20,9 @@ class Lecturer extends Model
         'email',
         'password'
     ];
+
+    function units():HasMany
+    {
+        return $this->hasMany(Unit::class,'lecturer','staffNo');
+    }
 }

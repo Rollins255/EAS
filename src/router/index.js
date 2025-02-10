@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useUserStore } from '@/stores/user';
+import { useLecturerStore } from '@/stores/lecturer';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -23,6 +24,11 @@ const router = createRouter({
       component:()=> import('@/views/LoginView.vue')
     },
     {
+      path:'/lecturer/login',
+      name:'Lecturer Login',
+      component:()=> import('@/views/LecturerLoginView.vue')
+    },
+    {
       path:'/register',
       name:'Register',
       component:()=> import('@/views/LoginView copy.vue')
@@ -30,12 +36,17 @@ const router = createRouter({
     {
       path:'/dashboard',
       name:'admin-dashboard',
-      component:()=>import ('@/views/Admin/LearnersView.vue')
+      component:()=>import ('@/views/Admin/AdminDashboardView.vue')
     },
     {
       path:'/add/new-student',
       name:'new-student',
       component:()=>import ('@/views/Admin/Learners/NewLearnerView.vue')
+    },
+    {
+      path:'/add/new-lecturer',
+      name:'new-lecturer',
+      component:()=>import ('@/views/Admin/LecturerRegistrationForm.vue')
     },
     {
       path:'/student/update',
@@ -70,8 +81,13 @@ const router = createRouter({
   ],
 })
 router.beforeEach((to, from, next) => {
+  if(sessionStorage.getItem('lecturer')){
+    useLecturerStore().setLecturer(JSON.parse(sessionStorage.getItem('lecturer')))
+  }
+
+
   const token = localStorage.getItem('token');
-  const publicPages = ['/login', '/register'];
+  const publicPages = ['/login', '/register','/lecturer/login'];
   const authRequired = !publicPages.includes(to.path);
   if(token != null){
     useUserStore().setLoggedIn(true);

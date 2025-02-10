@@ -6,11 +6,11 @@ use App\Models\Facilas;
 use App\Models\Student;
 use App\Models\Facial;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
-    //
-
+    
     /**
      * registering students
      */
@@ -24,7 +24,7 @@ class StudentController extends Controller
             'course' => ['required'],
         ]);
         
-        $student = Student::create([
+        $data = Student::create([
             'name' => $request->name,
             'regNo' => $request->regNo,
             'idNo' => $request->idNo,
@@ -32,8 +32,17 @@ class StudentController extends Controller
             'department' => $request->department,
             'course' => $request->course,
             'units' => json_encode($request->units),
+            'password' => Hash::make($request->string('idNo')),
         ]);
-        logger()->info($student);
+        $student = [
+            'name' => $data->name,
+            'regNo' => $data->regNo,
+            'idNo' => $data->idNo,
+            'faculty' => $data->faculty,
+            'department' => $data->department,
+            'course' => $data->course,
+            'units' => json_encode($data->units),
+        ];
         return response()->json([
             'student' => $student
         ],200);
@@ -80,11 +89,7 @@ class StudentController extends Controller
             'student' => $student->regNo,
             'descriptors' => json_encode($request->facials)
         ]);
-        // <!-- Student::where('regNo',$request->student['regNo'])
-        //             ->update([
-        //             'facials' =>  
-        //             // ]) -->
-
+    
         return response()->json([
             'data' => $data,
             'message' => "updated sucessfully"

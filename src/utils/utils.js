@@ -922,7 +922,9 @@ export const department = (f, d) => {
 export const username = ()=>{
     return "kimani"
 }
-
+/**
+ * faculty department course and unit are fetched using the label_tag
+ */
 export const getFaculty = (value)=>{
     let f_name
     faculties.forEach(element => {
@@ -991,7 +993,77 @@ export const getUnitName = (f,d,c,u)=>{
     });
     return u_name;
 }
+/**
+ *  faculty department course and unit are fetched using the id
+ */
+export const getFacultyById = (value)=>{
+    let f_name
+    faculties.forEach(element => {
+        if(element.id == value){
+            f_name =  element.label
+        }
+    });
+    return f_name;
+}
 
+export const getDepartmentById  = (f,d)=>{
+    let d_name
+    faculties.forEach(element => {
+        if(element.id == f){
+            element.departments.forEach(el=>{
+                if(el.id == d){
+                    d_name = el.label
+                }
+            })
+        }
+    });
+    return d_name;
+}
+
+export const getCourseById  = (f,d,c)=>{
+    
+    let c_name
+    faculties.forEach(element => {
+        if(element.id == f){
+            element.departments.forEach(el=>{
+                if(el.id == d){
+                    el.courses.forEach(course=>{
+                        if(course.id == c){
+                            // course.units.forEach(unit=>{
+                                // if(unit.code == u){
+                                    c_name = course.label
+                                // }
+                            // })
+                        }
+                    })
+                }
+            })
+        }
+    });
+    return c_name;
+}
+
+export const getUnitNameById  = (f,d,c,u)=>{
+    let u_name
+    faculties.forEach(element => {
+        if(element.id == f){
+            element.departments.forEach(el=>{
+                if(el.id == d){
+                    el.courses.forEach(course=>{
+                        if(course.id == c){
+                            course.units.forEach(unit=>{
+                                if(unit.code == u){
+                                    u_name = unit.name
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }
+    });
+    return u_name;
+}
 export const getFaculties = ()=>{
     let f = [];
     faculties.forEach(element=>{
@@ -1068,4 +1140,8 @@ export const getCourseId = (f,d,c)=>{
         }
     });
     return course;
+}
+
+export const slugCreator = (value)=>{
+    return value.replace(' ','-')
 }

@@ -13,13 +13,13 @@ const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
   <div>
     <p>This a list of routes</p>
     <Button>
-      <Router-link to="/dashboard"> Register Dashboard</Router-link>
+      <Router-link to="/dashboard"> Register Dashboard(sec)</Router-link>
     </Button>
     <Button>
-      <Router-link to="/login">Login</Router-link>
+      <Router-link to="/login">Login as admin</Router-link>
     </Button>
     <Button>
-      <Router-link to="/login">Register</Router-link>
+      <Router-link to="/login">Register admin</Router-link>
     </Button>
     <Button>
       <Router-link to="/dashboard/lecturer">Lecturer</Router-link>

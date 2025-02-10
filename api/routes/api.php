@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LectureController;
@@ -15,11 +16,14 @@ Route::middleware(['auth:sanctum'])->group(function (){
 
     Route::post('/logout',[LoginController::class,'logout']);
     Route::post('/register-student',[StudentController::class,'create']);
+    Route::post('/register-lecturer',[AdminController::class,'create']);
     Route::post('/get-student',[StudentController::class,'student']);
     Route::post('/get-students',[LectureController::class,'start']);
     Route::post('facial-data',[StudentController::class,'facials']);
-
+    Route::post('/lecturer-data',[AdminController::class,'lecturer']);
+    Route::post('/add-unit',[AdminController::class,'unitAdd']);
     Route::post('/set-class',[LectureController::class,'create']);
+    Route::post('/units',[LectureController::class,'units']);
     Route::post('/mark-attendance',[LectureController::class,'mark']);
 });
 
@@ -27,3 +31,4 @@ Route::middleware(['auth:sanctum'])->group(function (){
 
 Route::post('/register-admin',[RegisteredUserController::class,'store']);
 Route::post('/login',[LoginController::class,'login']);
+Route::post('/lecturer-login',[LoginController::class,'lecturer']);

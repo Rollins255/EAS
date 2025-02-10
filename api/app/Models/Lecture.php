@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lecture extends Model
 {
@@ -11,10 +12,17 @@ class Lecture extends Model
         'lecturer',
         'venue',
         'time',
-        'unitName',
-        'unitCode',
-        'faculty',
-        'department',
-        'course'
+        'unit',
+        // 'unitName',
+        // 'unitCode',
+        // 'faculty',
+        // 'department',
+        // 'course'
     ];
+
+
+    function unit():HasOne
+    {
+        return $this->hasOne(Unit::class,'id');
+    }
 }

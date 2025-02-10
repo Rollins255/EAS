@@ -27,7 +27,7 @@ watch(()=>students,()=>{
         data.value.push({
             name:el.name,
             reg:el.regNo,
-            time:'11:03',
+            time:el.clockIn,
             inClass:el.present
         })
     })

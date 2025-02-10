@@ -13,9 +13,9 @@ class AttendanceSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('attendances')->insert([
-            'lecture' => '1',
-            'student' =>  '2'
-        ]);
+        // DB::table('attendances')->insert([
+        //     'lecture' => '1',
+        //     'student' =>  '2'
+        // ]);
     }
 }

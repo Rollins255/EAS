@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('lectures', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('lecturer');
+            $table->string('lecturer');
             $table->string('venue');
             $table->string('time');
-            $table->string('unitCode');
-            $table->string('unitName');
-            $table->unsignedBigInteger('faculty');
-            $table->unsignedBigInteger('department');
-            $table->unsignedBigInteger('course');
+            // $table->string('unitCode');
+            $table->string('unit');
+            // $table->string('unitName');
+            // $table->unsignedBigInteger('faculty');
+            // $table->unsignedBigInteger('department');
+            // $table->unsignedBigInteger('course');
             $table->timestamps();
         });
     }

@@ -193,11 +193,11 @@ watch(()=>useStudentStore().student,()=>{
 const getStudent = ()=>{
     axiosClient.post('/get-student',{'registrationNumber':registrationNumber.value})
     .then(res=>{
-        student.value.regNo = res.data.student.regNo
+        student.value.regNo = res.data.student.regNo.toUpperCase()
         student.value.name = res.data.student.name
-        student.value.faculty = utils.faculty(res.data.student.faculty)
-        student.value.department = utils.department(res.data.student.faculty,res.data.student.department)
-        student.value.course ="Course " +res.data.student.course
+        student.value.faculty = utils.getFacultyById(res.data.student.faculty)
+        student.value.department = utils.getDepartmentById(res.data.student.faculty,res.data.student.department)
+        student.value.course = utils.getCourseById(res.data.student.faculty,res.data.student.department,res.data.student.course)
     })
     .catch(err=>{
         console.error(err)
