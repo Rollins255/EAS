@@ -29,6 +29,11 @@ const router = createRouter({
       component:()=> import('@/views/LecturerLoginView.vue')
     },
     {
+      path:'/student/login',
+      name:'Student Login',
+      component:()=> import('@/views/StudentLoginView.vue')
+    },
+    {
       path:'/register',
       name:'Register',
       component:()=> import('@/views/LoginView copy.vue')
@@ -77,6 +82,11 @@ const router = createRouter({
       path:'/class/attendance/:f/:d/:c/:u',
       name:'attendance',
       component:()=>import ('@/views/Class/RecognitionView.vue')
+    },
+    {
+      path:'/student/dashboard',
+      name:'student-dashboard',
+      component:()=>import ('@/views/Student/DashboardView.vue')
     }
   ],
 })
@@ -84,10 +94,18 @@ router.beforeEach((to, from, next) => {
   if(sessionStorage.getItem('lecturer')){
     useLecturerStore().setLecturer(JSON.parse(sessionStorage.getItem('lecturer')))
   }
+  if(sessionStorage.getItem('student')){
+    useUserStore().setUser(JSON.parse(sessionStorage.getItem('student')))
+  }
 
 
   const token = localStorage.getItem('token');
-  const publicPages = ['/login', '/register','/lecturer/login'];
+  const publicPages = [
+            '/login',
+            '/register',
+            '/lecturer/login',
+            '/student/login',
+        ];
   const authRequired = !publicPages.includes(to.path);
   if(token != null){
     useUserStore().setLoggedIn(true);

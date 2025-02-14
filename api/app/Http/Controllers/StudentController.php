@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Facilas;
 use App\Models\Student;
 use App\Models\Facial;
+use App\Models\Lecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
@@ -96,5 +99,21 @@ class StudentController extends Controller
         ]);
 
 
+    }
+
+    /**
+     * class attendance history
+     */
+    function history(){
+        $res = Attendance::where('student',Auth::user()->regNo)
+                        ->get()
+                        ->map(function($data){
+                            return [
+                                'id'=>$data->id,
+                                'lecture'=>Lecture::where('id',$data->lecture)->get(),
+                                'clockIn'=>$data->clockIn,
+                            ];
+                        });
+        return $res;
     }
 }

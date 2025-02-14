@@ -21,4 +21,9 @@ class Unit extends Model
     {
         return $this->belongsTo(Lecturer::class,'staffNo','lecturer');
     }
+
+    function student():BelongsTo
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

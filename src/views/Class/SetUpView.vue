@@ -97,7 +97,6 @@ function courseSelect(value){
     courses.value.forEach(el=>{
         if(value.label == el.label){
             items.value[2] = {label:el,tag:'c'}
-            // units.value = el.units
         }
     })
     let data = {

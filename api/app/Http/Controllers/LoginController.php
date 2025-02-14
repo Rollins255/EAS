@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\Lecturer;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -64,6 +65,60 @@ class LoginController extends Controller
                 'units' => $user->units,
             ]
         ]);
+    }
+
+    /**
+     * login student
+     */
+    function student(Request $request){
+        $request->validate([
+            'regNo' => 'required',
+            'password' => 'required',
+        ]);
+
+        $user = Student::where('regNo',$request->regNo)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'regNo' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+     
+
+        return response()->json([
+            'token' => $user->createToken('token')->plainTextToken,
+            'student' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'regNo' => $user->regNo,
+                'idNo' => $user->idNo,
+                'department' => $user->department,
+                'faculty' => $user->faculty,
+                'course' => $user->course,
+                // 'units' => $user->units,
+                // 'units' => \App\Models\Unit::where('code',json_decode($user->units,true))->get(),
+                'units' => (function($user){
+                    $codes = json_decode($user->units,true);
+                    $units = [];
+                    foreach ($codes as $code) {
+                        // add the units to the units array
+                        $unit = \App\Models\Unit::where('code',$code)->first();
+                        if($unit){
+                            $units[] = [
+                                'name' => $unit->name,
+                                'code' => $unit->code,
+                                'count' => $unit->count,
+                                'lecturer' => Lecturer::where('staffNo',$unit->lecturer)->get('name')[0],
+                            ];
+                        }
+                    }
+
+                    return $units;
+                })($user),
+            ]
+        ]);
+
+        // logger()->info($user);
     }
 
     /**
