@@ -95,8 +95,6 @@ class LoginController extends Controller
                 'department' => $user->department,
                 'faculty' => $user->faculty,
                 'course' => $user->course,
-                // 'units' => $user->units,
-                // 'units' => \App\Models\Unit::where('code',json_decode($user->units,true))->get(),
                 'units' => (function($user){
                     $codes = json_decode($user->units,true);
                     $units = [];
@@ -118,7 +116,6 @@ class LoginController extends Controller
             ]
         ]);
 
-        // logger()->info($user);
     }
 
     /**

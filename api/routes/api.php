@@ -21,6 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::post('/get-students',[LectureController::class,'start']);
     Route::post('facial-data',[StudentController::class,'facials']);
     Route::post('/student-history',[StudentController::class,'history']);
+    Route::post('/student/add-unit',[StudentController::class,'addUnit']);
+    Route::get('/student',[StudentController::class,'studentData']);
     Route::post('/lecturer-data',[AdminController::class,'lecturer']);
     Route::post('/add-unit',[AdminController::class,'unitAdd']);
     Route::post('/set-class',[LectureController::class,'create']);

@@ -4,8 +4,16 @@ import StudentProfile from '@/components/StudentProfile.vue';
 import StudentHistory from '@/components/StudentHistory.vue';
 import { onMounted, watch,ref } from 'vue';
 import { useUserStore } from '@/stores/user';
+import axiosClient from '@/axios/axios';
 const student = ref()
 onMounted(()=>{
+    axiosClient.get('/student')
+    .then(res=>{
+        console.log(res.data)
+    })
+    .catch(err=>{
+        console.error(err)
+    })
     useUserStore().user = JSON.parse(sessionStorage.getItem('student'))
 })
 
