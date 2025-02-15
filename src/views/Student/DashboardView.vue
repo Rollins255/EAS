@@ -5,11 +5,16 @@ import StudentHistory from '@/components/StudentHistory.vue';
 import { onMounted, watch,ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import axiosClient from '@/axios/axios';
+import { useStudentStore } from '@/stores/student';
 const student = ref()
 onMounted(()=>{
     axiosClient.get('/student')
     .then(res=>{
+        console.log('data')
         console.log(res.data)
+        useStudentStore().setStudent(res.data.student)
+        useUserStore().setUser(res.data.student)
+        sessionStorage.setItem('student',JSON.stringify(res.data.student))
     })
     .catch(err=>{
         console.error(err)

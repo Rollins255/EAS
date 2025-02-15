@@ -36,7 +36,7 @@ function onSubmit() {
     axiosClient.post('/student/login',user.value)
     .then(res=>{
         console.log(res.data)
-        localStorage.setItem('token',res.data.token)
+        sessionStorage.setItem('token',res.data.token)
         sessionStorage.setItem('student',JSON.stringify(res.data.student))
         useUserStore().setLoggedIn(true)
         useUserStore().setUser(res.data.student)

@@ -2,9 +2,11 @@
 import { useUserStore } from '@/stores/user';
 import { getCourseById, getDepartmentById, getFacultyById } from '@/utils/utils';
 import { onMounted, ref, watch } from 'vue';
-import { Divider,Button,InputText,Dialog,Toast } from 'primevue';
+import { Divider,Button,InputText,Dialog,Toast,ConfirmPopup } from 'primevue';
 import { useToast } from 'primevue';
 import axiosClient from '@/axios/axios';
+import { useConfirm } from "primevue/useconfirm";
+import { useStudentStore } from '@/stores/student';
 const props = defineProps({student:Object})
 const student = ref()
 const toast = useToast()
@@ -13,27 +15,63 @@ const unit = ref({
     name:'',
     code:'',
 })
+const confirm = useConfirm();
 watch(useUserStore(),()=>{
     student.value = useUserStore().user
 })
 function addUnit(){
+    unit.value.code = unit.value.code.toUpperCase()
     axiosClient.post('/student/add-unit',unit.value)
     .then(res=>{
+        show(unit.value.code)
+        useUserStore().setUser(res.data.student)
+        unit.value.code = ''
+        unit.value.name = ''
         visible.value = false
-        show()
-        console.log(res.data)
     })
     .catch(err=>{
         console.error(err)
     })
 }
-function show(){
-    toast.add({severity:'success',summary:"Successfully added"})
+function show(code){
+    toast.add({severity:'success',summary:code + " Successfully added",life:5000})
 }
+const confirm1 = (event,unit) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Are you sure you want to remove this unit?',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Remove',
+            severity: 'danger'
+        },
+        accept: () => {
+            console.log(unit.code)
+            axiosClient.post('/student/remove-unit',{code:unit.code})
+            .then(res=>{
+                useStudentStore().setStudent(res.data.student)
+                useUserStore().setUser(res.data.student)
+                sessionStorage.setItem('student',JSON.stringify(res.data.student))
+            })
+            .catch(err=>{
+                console.error(err)
+            })
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted the removed action', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected the remove action', life: 3000 });
+        }
+    });
+};
 </script>
 <template>
-    <!-- {{ JSON.parse(student.units) }} -->
-    <!-- {{ useUserStore() }} -->
+    <ConfirmPopup></ConfirmPopup>
+    <Toast></Toast>
     <div v-if="student">
         <div class="grid grid-cols-2 gap-4">
             <div>
@@ -84,8 +122,11 @@ function show(){
                 </Button>
             </div>
         </div>
-        <div class="grid grid-cols-4 gap-5 text-center">
+        <div class="grid sm:grid-cols-4 grid-cols-2 gap-5 text-center">
          <div v-for="item in student.units" :key="item.id" class="bg-blue-600 cursor-pointer rounded-xl shadow-lg p-3 text-white ">
+            <div class="flex justify-end h-5 ">
+                <Button severity="danger" class="w-5" @click="confirm1($event,item)" > <i  class="pi pi-trash"></i>  </Button>
+            </div>
             <p class="font-bold text-2xl">{{ item.name }}</p>
             <p>{{item.code}}</p>
             <p>By. {{item.lecturer.name}}</p>

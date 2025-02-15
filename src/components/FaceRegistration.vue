@@ -2,7 +2,7 @@
 <template>
     <div class="mb-4">
         <form @submit.prevent="getStudent">
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <InputText id="on_label" class="w-full  my-5" v-model="registrationNumber" required   autocomplete="off" />
                 <label for="on_label">Registration Number</label>
             </FloatLabel>
@@ -10,7 +10,7 @@
                 <Button type="submit">Submit</Button>
             </div>           
         </form>
-        <div class="grid grid-cols-2 font-bold  gap-2" v-if="student.name">
+        <div class="grid sm:grid-cols-2 grid-cols-1 font-bold  gap-2" v-if="student.name">
             <p v-for="data in student" class="my-2 border-b ">
                 {{ data }}
             </p>
@@ -22,7 +22,7 @@
         <div>
             <p class="text-center  py-5">Step 1. Upload similar face images of the same person atleast 3 images.</p>
         </div>
-        <div class="card mx-auto w-3/4" >
+        <div class="card mx-auto sm:w-3/4" >
             <FileUpload name="demo[]" url="/api/upload" @upload="onTemplatedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" @select="onSelectedFiles">
                 <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                     <div class="flex flex-wrap justify-between items-center flex-1 gap-4">

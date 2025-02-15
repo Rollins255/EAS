@@ -1,33 +1,33 @@
 <template>
     <nav-bar></nav-bar>
     <Toast/>
-    <div class="w-screen flex items-center h-[70vh]">
-        <form class="w-1/2 mx-auto bg-slate-200 rounded-md" @submit.prevent="onSubmit">
+    <div class="w-screen flex items-center h-fit overflow-auto">
+        <form class="sm:w-1/2 w-[90%] mx-auto bg-slate-200 rounded-md" @submit.prevent="onSubmit">
             <div class="my-5">
                 <p class="text-4xl font-extrabold font-serif text-center">R E G I S T E R</p>
             </div>
-            <div class="grid grid-cols-2">
-                <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <div class="grid sm:grid-cols-2 grid-cols-1">
+                <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                     <InputText id="name_label" class="w-full my-5" required v-model="user.name" autocomplete="off" />
                     <label for="name_label">Name</label>
                 </FloatLabel>
-                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                     <InputText id="staffNo_label" class="w-full my-5" required v-model="user.staffNo" autocomplete="off" />
                     <label for="staffNo_label">Staff No</label>
                 </FloatLabel>
-                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                     <InputText id="idNo_label" class="w-full my-5" required v-model="user.idNo" autocomplete="off" />
                     <label for="idNo_label">ID No</label>
                 </FloatLabel>
-                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                     <InputText id="on_label" class="w-full  my-5" required v-model="user.email"  autocomplete="off" />
                     <label for="on_label">Email</label>
                 </FloatLabel>
-                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                <FloatLabel variant="on" class="sm:w-1/2 w-[80%] mx-auto ">
                     <Select  class="w-full  my-5"  v-model="user.faculty" :options="faculties" ></Select>
                     <label for="on_label">Faculty</label>
                 </FloatLabel>
-                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                <FloatLabel variant="on" class="sm:w-1/2  w-[80%] mx-auto">
                     <Select  class="w-full  my-5"  v-model="user.department" :options="department" ></Select>
                     <label for="on_label">Department</label>
                 </FloatLabel>

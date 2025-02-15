@@ -2,34 +2,34 @@
     <Toast/>
     <div>
         <form @submit.prevent="onSubmit">
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <InputText id="on_label" class="w-full  my-5" required v-model="user.name"  autocomplete="off" />
                 <label for="on_label">Name</label>
             </FloatLabel>
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <InputText id="on_label" class="w-full  my-5" required v-model="user.regNo"  autocomplete="off" />
                 <label for="on_label">Registration No.</label>
             </FloatLabel>
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <InputText id="on_label" class="w-full  my-5" required v-model="user.idNo"  autocomplete="off" />
                 <label for="on_label">ID No.</label>
             </FloatLabel>
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <Select  class="w-full  my-5"  v-model="user.faculty" :options="faculties" ></Select>
                 <label for="on_label">Faculty</label>
             </FloatLabel>
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <Select  class="w-full  my-5"  v-model="user.department" :options="department" ></Select>
                 <!-- <InputText id="on_label" class="w-full  my-5" required v-model="user.department"  autocomplete="off" /> -->
                 <label for="on_label">Department</label>
             </FloatLabel>
-            <FloatLabel variant="on" class="w-1/2 mx-auto">
+            <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
                 <Select  class="w-full  my-5"  v-model="user.course" :options="courses" ></Select>
                 <!-- <InputText id="on_label" class="w-full  my-5" required v-model="user.course"  autocomplete="off" /> -->
                 <label for="on_label">Course</label>
             </FloatLabel>
-            <div class="flex justify-center w-4/5  mx-auto" v-if="!isSubmitting">
-                <Button type="submit" class=" w-1/2 mx-auto">R E G I S T E R</Button>
+            <div class="flex justify-center sm:w-4/5  mx-auto" v-if="!isSubmitting">
+                <Button type="submit" class=" sm:w-1/2 mx-auto text-nowrap">R E G I S T E R</Button>
             </div>
         </form>
     </div>
@@ -109,7 +109,7 @@ function onSubmit(){
         faculty:getFacultyId(user.value.faculty),
         department:getDepartmentId(user.value.faculty,user.value.department),
         course:getCourseId(user.value.faculty,user.value.department,user.value.course),
-        units:["c1","c2","c3","c4"]
+        units:[]
     }
     axiosClient.post('/register-student',data)
     .then(res=>{

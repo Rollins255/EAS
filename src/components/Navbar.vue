@@ -14,12 +14,12 @@ import { Button } from 'primevue';
 import { onMounted,ref } from 'vue';
 const token = ref()
 onMounted(()=>{
-    token.value = localStorage.getItem('token')
+    token.value = sessionStorage.getItem('token')
 })
 const logout = ()=>{
     axiosClient.post('/logout')
     .then((res)=>{
-        localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
         router.push('/login')
     })
     .catch(err=>{

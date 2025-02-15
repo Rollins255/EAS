@@ -36,7 +36,7 @@ const user = ref({
 function onSubmit() {
     axiosClient.post('/lecturer-login',user.value)
     .then(res=>{
-        localStorage.setItem('token',res.data.token)
+        sessionStorage.setItem('token',res.data.token)
         useUserStore().setLoggedIn(true)
         useLecturerStore().setLecturer(res.data.user)
         sessionStorage.setItem('lecturer',JSON.stringify(useLecturerStore().lecturer))

@@ -14,9 +14,8 @@
         @click="unitSelect(unit)"
         class="bg-slate-300 w-[95%] py-3 cursor-pointer m-2 rounded shadow-lg mx-auto text-center"
         >
-        {{ unit }}
-            <p class="text-3xl">{{unit.code}}</p>
-            <p class="font-bold my-4">{{unit.name}}</p>
+            <p class="text-4xl font-bold">{{unit.code}}</p>
+            <p class="font-bold  text-lg my-4">{{unit.name}}</p>
             <p class="text-sm">{{getFacultyById(unit.faculty)}}</p>
         </div>
         

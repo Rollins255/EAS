@@ -99,7 +99,7 @@ router.beforeEach((to, from, next) => {
   }
 
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const publicPages = [
             '/login',
             '/register',

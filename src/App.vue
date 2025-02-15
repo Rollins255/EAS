@@ -4,7 +4,7 @@ import Button from 'primevue/button'
 import { onUnmounted } from 'vue';
 
 onUnmounted(()=>{
-  localStorage.clear()
+  sessionStorage.clear()
 })
 </script>
 

@@ -36,7 +36,7 @@ function onSubmit() {
     axiosClient.post('/login',user.value)
     .then(res=>{
         console.log(res.data)
-        localStorage.setItem('token',res.data)
+        sessionStorage.setItem('token',res.data)
         useUserStore().setLoggedIn(true)
         router.push('/dashboard')
     })
