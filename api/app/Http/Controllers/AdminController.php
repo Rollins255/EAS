@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
+use App\Models\Lecture;
 use App\Models\Lecturer;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+
+use function PHPUnit\Framework\isEmpty;
 
 class AdminController extends Controller
 {
@@ -46,7 +51,6 @@ class AdminController extends Controller
      * getting lecturer data
      */
     function lecturer(Request $request){
-        logger()->info($request);
         $lecturer = Lecturer::where('staffNo',$request->staffNo)
                     ->get()
                     ->map(function($data){
@@ -57,18 +61,19 @@ class AdminController extends Controller
                             'faculty' => $data->faculty,
                             'department' => $data->department,
                             'email' => $data->email,
-                            'units' => $data->units->map(function($unit){
-                                        return [
-                                            'id' => $unit->id,
-                                            'name' => $unit->name,
-                                            'code' => $unit->code,
-                                            'count' => $unit->count,
-                                            'lecturer' => $unit->lecturer,
-                                            'faculty' => $unit->faculty,
-                                            'department' => $unit->department,
-                                            'course' => $unit->course,
-                                        ];
-                                    })
+                            'units' => $data->units == null ? []
+                                        :$data->units->map(function($unit){
+                                            return [
+                                                'id' => $unit->id,
+                                                'name' => $unit->name,
+                                                'code' => $unit->code,
+                                                'count' => $unit->count,
+                                                'lecturer' => $unit->lecturer,
+                                                'faculty' => $unit->faculty,
+                                                'department' => $unit->department,
+                                                'course' => $unit->course,
+                                            ];
+                                        })
                                 
                         ];
                     });
@@ -107,5 +112,30 @@ class AdminController extends Controller
         return response()->json([
             'lecturer' => $this->lecturer(new Request($data))->original
         ]);
+    }
+
+    /**
+     * unit history
+     */
+    function unitHistory($code){
+
+        $unit_id = Unit::where('code',$code)->get('id')[0];
+        $lecture = Lecture::where('unit',$unit_id->id)
+                            ->where('lecturer',Auth::user()->staffNo)
+                            ->get()
+                            ->map(function($data){
+                                return [
+                                    'id' => $data->id,
+                                    'venue' => $data->venue,
+                                    'time' => $data->time,
+                                    'total' => Attendance::where('lecture',$data->id)->count()
+                                ];
+                            });
+
+
+        return response()->json([
+            'history' => $lecture
+        ]);
+
     }
 }

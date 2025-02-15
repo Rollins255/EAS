@@ -71,7 +71,7 @@ const router = createRouter({
     },
     {
       path:'/unit/:id',
-      name:'/unit',
+      name:'unit-view',
       component:()=>import ('@/views/Admin/Lecturer/UnitView.vue')
     },
     {
@@ -124,10 +124,10 @@ router.beforeEach((to, from, next) => {
     '/student/login'
   ]
   const lecturerPages = [
-    '/lecturer/login',
-    '/dashboard/lecturer',
-    '/unit/:id',
-    '/class/setup'
+    'lecturer-dashboard',
+    'unit-view',
+    'class-setup',
+    'attendance'
   ]
   const authRequired = !publicPages.includes(to.path);
   if(token != null){
@@ -140,19 +140,16 @@ router.beforeEach((to, from, next) => {
   } else if(isAuthenticated){
     if(publicPages.includes(to.path)){
       if(user == "lecturer"){
-        console.log("lecturer goinh ouy")
         return next("/dashboard/lecturer")
       }else if(user == "student"){
-        console.log("lecturer goinh ouy")
         return next("/student/dashboard")
       }else{
         return next('/dashboard');
       }
     }else{
-      console.log(user)
       // checks if the user is actully accessing own routes
       if(user == "lecturer"){
-        if(!lecturerPages.includes(to.path)){
+        if(!lecturerPages.includes(to.name)){
           return next("/dashboard/lecturer")
         }else{
             return next()

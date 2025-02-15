@@ -66,8 +66,8 @@ function saveUnit(){
         'faculty':getFacultyId(unit.value.faculty),
         'department':getDepartmentId(unit.value.faculty,unit.value.department),
         'course':getCourseId(unit.value.faculty,unit.value.department,unit.value.course),
-        'unit_code':unit.value.unit_code,
-        'unit_name':unit.value.unit_name,
+        'unit_code':unit.value.unit_code.toUpperCase(),
+        'unit_name':unit.value.unit_name.toUpperCase(),
         'lecturer':useLecturerStore().lecturer.staffNo
     }
     console.log(newUnit)

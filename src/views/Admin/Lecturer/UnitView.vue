@@ -1,6 +1,6 @@
 <template>
     <nav-bar/>
-    {{ useRoute() }}
+    <!-- {{ useRoute() }} -->
     <div class="w-full">
         <div class="w-4/5 mx-auto">
             <div class="bg-blue-200 m-4 rounded grid grid-cols-2">
@@ -37,7 +37,7 @@
                             </form>
                         </TabPanel>
                         <TabPanel value="1">
-                            <UnitsHistory></UnitsHistory>
+                            <UnitsHistory :history="history"></UnitsHistory>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
@@ -48,7 +48,7 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { onMounted,watch, ref } from 'vue';
 import UnitsHistory from '@/components/UnitsHistory.vue'
 import { FloatLabel,Select,Button,Tabs,Tab,TabList,TabPanels,TabPanel } from 'primevue';
 import axiosClient from '@/axios/axios';
@@ -56,13 +56,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { getCourseById, getCourses, getDepartmentById, getFacultyById } from '@/utils/utils';
 import { useLecturerStore } from '@/stores/lecturer';
 import router from '@/router';
+const route = useRoute()
+const history = ref()
 const lecture = ref({
     venue:null,
     class_time:null
 })
-console.log(useRoute().query.f)
-// faculty getFacultyById(useRoute().query.f)
-// department getDepartmentById(useRoute().query.f,useRoute().query.d)
 const classes = getCourses(getFacultyById(useRoute().query.f),getDepartmentById(useRoute().query.f,useRoute().query.d))
 const class_time = ref([
     { name: '7am-9am', code: '1' },
@@ -78,7 +77,18 @@ const venue = ref([
     {name:'Room 3'},
     {name:'Room 4'},
 ])
-let route = useRoute()
+
+setTimeout(()=>{
+    console.log(route)
+    axiosClient.get('/unit-history/'+route.query.code.toUpperCase())
+    .then(res=>{
+        history.value = res.data.history
+    })
+    .catch(err=>{
+        consosle.error(err)
+    })
+},2000)
+
 const onSubmit = ()=>{
     let lect = {
         // 'course':lecture.value.course.name,

@@ -20,7 +20,8 @@ const logout = ()=>{
     axiosClient.post('/logout')
     .then((res)=>{
         sessionStorage.removeItem('token')
-        router.push('/login')
+        sessionStorage.clear()
+        router.push('/')
     })
     .catch(err=>{
         console.error(err)

@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('password');
             $table->unsignedBigInteger('faculty');
             $table->unsignedBigInteger('department');
-            $table->json('units')->nullable();
             $table->timestamps();
         });
     }

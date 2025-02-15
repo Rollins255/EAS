@@ -62,7 +62,9 @@ onMounted(()=>{
 })
 
 function unitSelect(value){
-   router.push(`/unit/${value.id}?unit=${value.name.toLowerCase()}&code=${value.code.toLowerCase()}&f=${value.faculty}&d=${value.department}&c=${value.course}`)
+    console.log(value)
+    // router.push('/')
+   router.replace(`/unit/${value.id}?unit=${value.name.toLowerCase()}&code=${value.code.toLowerCase()}&f=${value.faculty}&d=${value.department}&c=${value.course}`)
 //    router.push(`/unit/${value.id}?unit=${value}`)
 }
 </script>

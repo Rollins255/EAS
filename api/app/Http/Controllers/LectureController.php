@@ -72,7 +72,11 @@ class LectureController extends Controller
      * getting students for a lecture
      */
     function start(Request $request){
-    
+        logger()->info($request);
+        $data =  Student::where('faculty',$request->faculty)
+                        ->where('department',$request->department)
+                        ->where('course',$request->course)->get();
+        logger()->info($data);
         $students = Student::where('faculty',$request->faculty)
                             ->where('department',$request->department)
                             ->where('course',$request->course)
