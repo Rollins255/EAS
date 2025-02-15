@@ -131,9 +131,55 @@ class StudentController extends Controller
         $data = json_decode($units->units);
         $data[] = $request['code'];
         $response = Student::where('regNo',Auth::user()->regNo)->update(['units'=>$data]);
+        if($response == 1){
+            $user = Student::where('regNo',Auth::user()->regNo)->get()[0];
+            return response()->json([
+                'student' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'regNo' => $user->regNo,
+                    'idNo' => $user->idNo,
+                    'department' => $user->department,
+                    'faculty' => $user->faculty,
+                    'course' => $user->course,
+                    'units' => (function($user){
+                        $codes = json_decode($user->units,true);
+                        $units = [];
+                        foreach ($codes as $code) {
+                            // add the units to the units array
+                            $unit = \App\Models\Unit::where('code',$code)->first();
+                            if($unit){
+                                $units[] = [
+                                    'name' => $unit->name,
+                                    'code' => $unit->code,
+                                    'count' => $unit->count,
+                                    'lecturer' => Lecturer::where('staffNo',$unit->lecturer)->get('name')[0],
+                                ];
+                            }
+                        }
+                        return $units;
+                    })($user),
+                ]
+            ]);
+        }else{
+            return response(200);
+        }
+    }
+
+    /**
+     * remove unit
+     */
+    function removeUnit(Request $request){
+        $request->validate([
+            'code' =>'required',
+        ]);
+        $units = Student::where('regNo',Auth::user()->regNo)->get('units')[0];
+        $data = json_decode($units->units);
+        $data = array_values(array_diff($data,[$request->code]));
+        $response = Student::where('regNo',Auth::user()->regNo)->update(['units'=>$data]);
 
         if($response == 1){
-            $user = Auth::user();
+            $user = $user = Student::where('regNo',Auth::user()->regNo)->get()[0];
             return response()->json([
                 'student' => [
                     'id' => $user->id,
