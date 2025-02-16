@@ -23,6 +23,6 @@ class Lecture extends Model
 
     function unit():HasOne
     {
-        return $this->hasOne(Unit::class,'id');
+        return $this->hasOne(Unit::class,'id','unitsss');
     }
 }

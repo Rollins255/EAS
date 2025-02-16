@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\Facial;
 use App\Models\Lecture;
 use App\Models\Lecturer;
+use App\Models\Unit;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -112,7 +113,28 @@ class StudentController extends Controller
                         ->map(function($data){
                             return [
                                 'id'=>$data->id,
-                                'lecture'=>Lecture::where('id',$data->lecture)->get(),
+                                'lecture'=>Lecture::where('id',$data->lecture)
+                                                ->get()
+                                                ->map(function($lecture){
+                                                    return [
+                                                        'id' => $lecture->id,
+                                                        'lecturer' => $lecture->lecturer,
+                                                        'venue' => $lecture->venue,
+                                                        'time' => $lecture->time,
+                                                        'unit' => Unit::where('id',$lecture->unit)
+                                                                        ->get()->map(function($unit){
+                                                                            return [
+                                                                                'id' =>  $unit->id,
+                                                                                'code' =>  $unit->code,
+                                                                                'count' =>  $unit->count,
+                                                                                'course' =>  $unit->course,
+                                                                                'name' =>  $unit->name,
+                                                                                'lecturer' =>  $unit->lecturer,
+                                                                            ];
+                                                                        }),
+                                                        // 'id' => $lecture->unit(),
+                                                    ];
+                                                }),
                                 'clockIn'=>$data->clockIn,
                             ];
                         });

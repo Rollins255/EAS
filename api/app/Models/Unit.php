@@ -26,4 +26,9 @@ class Unit extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    function lecture():BelongsTo
+    {
+        return $this->belongsTo(Lecture::class,'unitsss','id');
+    }
 }
