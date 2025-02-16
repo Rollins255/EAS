@@ -1,29 +1,29 @@
 <template>
     <Toast/>
-    <form @submit.prevent="saveUnit">
-        <div class="flex items-center gap-4 mb-4">
+    <form @submit.prevent="saveUnit" >
+        <div class="md:flex items-center gap-4 mb-4">
             <label for="username" class="font-semibold w-24">Faculty</label>
             <Select  class="w-full" required  v-model="unit.faculty" :options="faculties" ></Select>
         </div>
-        <div class="flex items-center gap-4 mb-4">
+        <div class="md:flex items-center gap-4 mb-4">
             <label for="email" class="font-semibold w-24">Department</label>
             <Select  class="w-full" required  v-model="unit.department" :options="department" ></Select>
         </div>
-        <div class="flex items-center gap-4 mb-4">
+        <div class="md:flex items-center gap-4 mb-4">
             <label for="username" class="font-semibold w-24">Course</label>
             <Select  class="w-full" required  v-model="unit.course" :options="courses" ></Select>
         </div>
-        <div class="flex items-center gap-4 mb-4">
+        <div class="md:flex items-center gap-4 mb-4">
             <label for="unit_name" class="font-semibold w-24">Unit Name</label>
             <InputText id="unit_name" v-model="unit.unit_name" required="" class="flex-auto" autocomplete="off" />
         </div>
-        <div class="flex items-center gap-4 mb-4">
+        <div class="md:flex items-center gap-4 mb-4">
             <label for="unit_code" class="font-semibold w-24">Unit code</label>
             <InputText id="unit_code" v-model="unit.unit_code" required="" class="flex-auto" autocomplete="off" />
         </div>
         <div class="flex justify-end gap-2">
-            <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-            <Button type="submit" label="Save" @click="visible = false"></Button>
+            <Button type="button" label="Cancel" severity="secondary" @click="emit('close')"></Button>
+            <Button type="submit" label="Save" ></Button>
         </div>
     </form>
 </template>

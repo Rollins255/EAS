@@ -18,9 +18,12 @@ const choices = [
 </script>
 
 <template>
-    <div class="sm:flex justify-around items-center h-screen">
-        <div class="bg-blue-500 rounded shadow-lg cursor-pointer" v-for="item in choices" @click.prevent="router.push(`${item.link}`)" >
-            <p class="p-10 text-center text-4xl font-bold  m-5">{{item.name.toUpperCase()}}</p>
+    <div class="flex justify-around items-center  h-screen">
+        <div >
+            <div class="bg-blue-500 rounded shadow-lg my-auto cursor-pointer" v-for="item in choices" @click.prevent="router.push(`${item.link}`)" >
+                <p class="p-10 text-center md:text-4xl  text-xl font-bold  m-5">{{item.name.toUpperCase()}}</p>
+            </div>
         </div>
+        
     </div>
 </template>

@@ -13,7 +13,6 @@ import { onMounted, ref, watch } from 'vue';
 import { DataTable,Column } from 'primevue';
 const props = defineProps({history:Object})
 const data = ref([])
-console.log(props.history)
 onMounted(()=>{
     fillTable()
 })

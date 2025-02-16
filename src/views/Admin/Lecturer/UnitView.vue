@@ -2,15 +2,21 @@
     <nav-bar/>
     <!-- {{ useRoute() }} -->
     <div class="w-full">
-        <div class="w-4/5 mx-auto">
-            <div class="bg-blue-200 m-4 rounded grid grid-cols-2">
-                <p><span class="font-bold text-lg m-2">UNIT NAME:</span> {{useRoute().query.unit.toUpperCase()}}</p>
-                <p><span class="font-bold text-lg m-2">UNIT CODE:</span> {{useRoute().query.code.toUpperCase()}}</p>
-                <p><span class="font-bold text-lg m-2">FACULTY:</span>{{getFacultyById(useRoute().query.f).toUpperCase()}}</p>
-                <p><span class="font-bold text-lg m-2">DEPARTMENT:</span> {{ getDepartmentById(useRoute().query.f,useRoute().query.d).toUpperCase() }}</p>
-                <p><span class="font-bold text-lg m-2">COURSE:</span> {{ getCourseById(useRoute().query.f,useRoute().query.d,useRoute().query.c).toUpperCase() }}</p>
+        <p class="w-fit pl-2 pr-5 bg-black-200 rounded m-2" @click="router.push('/')">
+            <i class="pi pi-angle-left px-2"></i>
+            <i class="pi pi-home"></i> 
+            Dashboard
+        </p>
+        <div class="md:w-4/5 mx-auto">
+            <div class="bg-blue-200 m-4 rounded grid md:grid-cols-2">
+                <p><span class="font-bold md:text-lg  m-2">UNIT NAME:</span> {{useRoute().query.unit.toUpperCase()}}</p>
+                <p><span class="font-bold md:text-lg m-2">UNIT CODE:</span> {{useRoute().query.code.toUpperCase()}}</p>
+                <p><span class="font-bold md:text-lg m-2">FACULTY:</span>{{getFacultyById(useRoute().query.f).toUpperCase()}}</p>
+                <p><span class="font-bold md:text-lg m-2">DEPARTMENT:</span> {{ getDepartmentById(useRoute().query.f,useRoute().query.d).toUpperCase() }}</p>
+                <p><span class="font-bold md:text-lg m-2">COURSE:</span> {{ getCourseById(useRoute().query.f,useRoute().query.d,useRoute().query.c).toUpperCase() }}</p>
             </div>
             <div>
+                
                 <Tabs value="0">
                     <TabList>
                         <Tab value="0">SET CLASS</Tab>
@@ -23,16 +29,16 @@
                                     <Select  class="w-full my-5" required  v-model="lecture.course"  :options="classes" ></Select>
                                     <label for="on_label">Class</label>
                                 </FloatLabel> -->
-                                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                                <FloatLabel variant="on" class="md:w-1/2 mx-auto">
                                     <Select  class="w-full my-5" required  v-model="lecture.class_time"  :options="class_time" optionLabel="name"></Select>
                                     <label for="on_label">Time</label>
                                 </FloatLabel>
-                                <FloatLabel variant="on" class="w-1/2 mx-auto">
+                                <FloatLabel variant="on" class="md:w-1/2 mx-auto">
                                     <Select  class="w-full my-5" required  v-model="lecture.venue"  :options="venue" optionLabel="name"></Select>
                                     <label for="on_label">Venue</label>
                                 </FloatLabel>
                                 <div class="mx-auto flex justify-center">
-                                    <Button type="submit">SET</Button>
+                                    <Button type="submit" class="w-1/2">S U B M I T</Button>
                                 </div>
                             </form>
                         </TabPanel>
@@ -79,7 +85,6 @@ const venue = ref([
 ])
 
 setTimeout(()=>{
-    console.log(route)
     axiosClient.get('/unit-history/'+route.query.code.toUpperCase())
     .then(res=>{
         history.value = res.data.history

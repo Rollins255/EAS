@@ -32,8 +32,11 @@
                     <label for="on_label">Department</label>
                 </FloatLabel>
             </div>
-            <div class="flex justify-center w-4/5  mx-auto">
-                <Button type="submit" class=" w-1/4 mx-auto">Register</Button>
+            <div class="flex justify-center md:w-4/5  mx-auto">
+                <Button v-if="!isSubmitting" type="submit" class=" md:w-1/4 mx-auto">R E G I S T E R</Button>
+                <Button v-else type="button" class=" w-1/4 mx-auto text-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="white"><circle cx="12" cy="3.5" r="2"><animateTransform attributeName="transform" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="0 12 12;90 12 12;180 12 12;270 12 12"/><animate attributeName="opacity" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle><circle cx="12" cy="3.5" r="1.5" transform="rotate(30 12 12)"><animateTransform attributeName="transform" begin="0.2s" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="30 12 12;120 12 12;210 12 12;300 12 12"/><animate attributeName="opacity" begin="0.2s" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle><circle cx="12" cy="3.5" r="1.5" transform="rotate(60 12 12)"><animateTransform attributeName="transform" begin="0.4s" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="60 12 12;150 12 12;240 12 12;330 12 12"/><animate attributeName="opacity" begin="0.4s" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle></g></svg>
+                </Button>
             </div>
         </form>
     </div>
@@ -62,11 +65,13 @@ const user = ref({
 const toast = useToast()
 const faculties = ref(getFaculties());
 const department = ref()
+const isSubmitting = ref(false)
 watch(()=>user.value.faculty,()=>{
     user.value.department = null
     department.value = getDepartments(user.value.faculty)
 })
 function onSubmit() {
+    isSubmitting.value = true
     let data = {
         name:user.value.name,
         staffNo:user.value.staffNo,
@@ -77,7 +82,6 @@ function onSubmit() {
     }
     axiosClient.post('/register-lecturer',data)
     .then(res=>{
-        console.log(res)
         user.value.name = null
         user.value.staffNo = null
         user.value.idNo = null
@@ -86,9 +90,12 @@ function onSubmit() {
         user.value.department = null
         show('success','Confirmation','Successfully Registered')
         router.push('/dashboard')
+        isSubmitting.value = false
     })
     .catch(err=>{
+        isSubmitting.value = false
         console.error(err)
+        show('error','E R R O R','Registarion failed!!')
     })
 }
 function show(severity,summary,detail) {

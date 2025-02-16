@@ -1,13 +1,13 @@
 <template>
     <nav-bar></nav-bar>
     <div class="flex justify-between w-[90%] mx-auto">
-       <div class="text-center font-serif font-bold text-4xl my-5">YOUR UNITS</div> 
-       <Button severity="info" class="h-fit my-auto" @click="visible = true" > 
+       <div class="text-center font-serif font-bold md:text-4xl text-2xl my-5">YOUR UNITS</div> 
+       <Button severity="info" class="h-fit my-auto text-xs" @click="visible = true" > 
         <i class="pi pi-plus"></i>
         Add Unit</Button>
     </div>
     
-    <div class=" w-full grid grid-cols-3">
+    <div class=" w-full grid md:grid-cols-2 lg:grid-cols-3">
         <div 
         v-if="useLecturerStore().lecturer"
         v-for="unit in useLecturerStore().lecturer.units"
@@ -29,7 +29,7 @@
     </div>
     
     <div class="card flex justify-center">
-        <Dialog v-model:visible="visible" modal header="Unit information" class="w-fit" >
+        <Dialog v-model:visible="visible" modal header="Unit information" class="md:w-fit w-[95%]" >
             <!-- <span class="text-surface-500 dark:text-surface-400 block mb-8">Unit information</span> -->
             <unit-form @close="visible = false"></unit-form>
         </Dialog>
@@ -62,9 +62,6 @@ onMounted(()=>{
 })
 
 function unitSelect(value){
-    console.log(value)
-    // router.push('/')
    router.replace(`/unit/${value.id}?unit=${value.name.toLowerCase()}&code=${value.code.toLowerCase()}&f=${value.faculty}&d=${value.department}&c=${value.course}`)
-//    router.push(`/unit/${value.id}?unit=${value}`)
 }
 </script>

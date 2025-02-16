@@ -1,9 +1,9 @@
 <template>
     <nav-bar/>
     <div>
-        <h1 class="font-bold text-center text-3xl py-4 font-serif">REGISTER LEARNER</h1>
+        <h1 class="font-bold text-center md:text-3xl text-xl py-4 font-serif">REGISTER LEARNER</h1>
     </div>
-    <div class="w-2/3 mx-auto">
+    <div class="md:w-2/3 w-[97%] mx-auto">
         <Stepper v-model:value="tab_value">
             <StepList>
                 <Step value="1">REGISTARTION FORM</Step>

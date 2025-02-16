@@ -1,5 +1,6 @@
 
 <template>
+    <Toast/>
     <div class="mb-4">
         <form @submit.prevent="getStudent">
             <FloatLabel variant="on" class="sm:w-1/2 mx-auto">
@@ -7,7 +8,10 @@
                 <label for="on_label">Registration Number</label>
             </FloatLabel>
             <div class="flex justify-center">
-                <Button type="submit">Submit</Button>
+                <Button v-if="!isSubmitting" type="submit">Submit</Button>
+                <Button v-else type="button" class=" w-1/4 mx-auto text-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="white"><circle cx="12" cy="3.5" r="2"><animateTransform attributeName="transform" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="0 12 12;90 12 12;180 12 12;270 12 12"/><animate attributeName="opacity" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle><circle cx="12" cy="3.5" r="1.5" transform="rotate(30 12 12)"><animateTransform attributeName="transform" begin="0.2s" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="30 12 12;120 12 12;210 12 12;300 12 12"/><animate attributeName="opacity" begin="0.2s" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle><circle cx="12" cy="3.5" r="1.5" transform="rotate(60 12 12)"><animateTransform attributeName="transform" begin="0.4s" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="60 12 12;150 12 12;240 12 12;330 12 12"/><animate attributeName="opacity" begin="0.4s" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle></g></svg>
+                </Button>
             </div>           
         </form>
         <div class="grid sm:grid-cols-2 grid-cols-1 font-bold  gap-2" v-if="student.name">
@@ -17,7 +21,7 @@
         </div>
     </div>
 
-    <div v-if="student.regNo != null">
+    <div v-if="student.regNo != null" class="bg-red-300 ">
         <!-- STEP 1 -->
         <div>
             <p class="text-center  py-5">Step 1. Upload similar face images of the same person atleast 3 images.</p>
@@ -28,7 +32,7 @@
                     <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
                         <div class="flex gap-2">
                             <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined severity="secondary"></Button>
-                            <Button @click="uploadEvent(uploadCallback)" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
+                            <Button @click="uploadEvent(uploadCallback),scrollToBottom()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
                             <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
                         </div>
                         <!-- <ProgressBar :value="totalSizePercent" :showValue="false" class="md:w-20rem h-1 w-full md:ml-auto">
@@ -85,8 +89,8 @@
                 <p class="text-center  py-5">Step 2. Upload the images  for recognition.</p>
             </div>
             <div class="w-4/5 border rounded mx-auto p-5 pt-10" >
-                <div  v-if="useLoadingStore().loading != '100%'" class="flex justify-center items-center">
-                    <p class="mr-5">
+                <div  v-if="useLoadingStore().loading != '100%'" class="md:flex justify-center items-center text-center">
+                    <p class="md:mr-5 ">
                         Load the model first
                     </p>
                     <Button @click="loadModel">Load model</Button>
@@ -97,7 +101,7 @@
                     <div class="w-full flex">
                        
                         <Button @click="trainModel" v-if="!isTraining" class="mx-auto">Upload the images</Button>
-                        <Button @click="trainModel" v-else class="mx-auto" severity="warn">U p l o a d i n g. . . .</Button>
+                        <Button v-else class="mx-auto" severity="warn">U p l o a d i n g. . . .</Button>
                     </div>
                 </div>
                 <p  v-if="successImages.length > 0 || failedImages.length  > 0 " class=" py-5 text-center">Image uplaoded successfull!!</p>
@@ -110,7 +114,7 @@
                 <div>
                     <p class="text-center  py-5">Step 3. Clean the images.</p>
                 </div>
-                <div class="w-4/5 shadow mx-auto p-5 max-h-[75vh] min-h-[45vh] overflow-auto">
+                <div class="md:w-4/5 shadow mx-auto p-5 max-h-[75vh] min-h-[45vh] overflow-auto">
                     <Tabs value="0">
                         <TabList>
                             <Tab value="0">CLEAR IMAGES</Tab>
@@ -118,19 +122,19 @@
                         </TabList>
                         <TabPanels>
                             <TabPanel value="0">
-                                <div class="grid grid-cols-3">
+                                <div class="grid md:grid-cols-3">
                                     <img v-for="image in successImages" class="mx-1 my-2 object-contain w-full h-[30vh]" :src=image alt="">
                                 </div>
                             </TabPanel>
                             <TabPanel value="1">
-                                <div class="grid grid-cols-3">
+                                <div class="grid md:grid-cols-3">
                                     <img v-for="image in failedImages" class="mx-1 my-2" :src=image alt="">
                                 </div>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
                     <div class="flex w-full justify-center" v-if="successImages.length != 0 ">
-                        <Button @click="cleanData" class="w-3/4" severity="info">CLEAN THE IMAGES</Button>
+                        <Button @click="cleanData" class="w-3/4 my-5 " severity="info">CLEAN THE IMAGES</Button>
                     </div>
                 </div>
 
@@ -141,7 +145,7 @@
                     </div>
                     <div>
                         <p class="text-center py-5">The images are all good</p>
-                        <div class="flex justify-center w-full">
+                        <div class="flex justify-center w-full py-10">
                             <Button severity="success" @click="uploadData">ALL GOOD 👍✨</Button>
                         </div>
                     </div>
@@ -155,19 +159,20 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { usePrimeVue } from 'primevue/config';
+import {Toast} from 'primevue'
+import { useToast } from 'primevue/usetoast';
 import * as utils from '@/utils/utils';
-// import { useToast } from "primevue/usetoast";
 import { FileUpload,Button,Message,Badge,ProgressBar,Tabs,Tab,TabList,TabPanels,TabPanel,FloatLabel,InputText } from 'primevue';
 import loadModels from '@/lib/loadModels';
 import * as faceapi from 'face-api.js'
 import { useLoadingStore } from '@/stores/modelLoad';
 import axiosClient from '@/axios/axios';
-import RegistarionForm from './RegistarionForm.vue';
 import { useStudentStore } from '@/stores/student';
 const $primevue = usePrimeVue();
-// const toast = useToast();
+const toast = useToast();
 const registrationNumber = ref(useStudentStore().student == null ? '': useStudentStore().student.regNo )
 const isModelLoading = ref(false)
+const isSubmitting = ref(false)
 const totalSize = ref(0);
 const totalSizePercent = ref(0);
 const files = ref([]);
@@ -191,15 +196,23 @@ watch(()=>useStudentStore().student,()=>{
     registrationNumber.value = useStudentStore().student.regNo
 })
 const getStudent = ()=>{
+    isSubmitting.value = true
     axiosClient.post('/get-student',{'registrationNumber':registrationNumber.value})
     .then(res=>{
+        isSubmitting.value = false
+        if(res.data.student  == null){
+            toast.add({severity:"error",summary:"STUDENT ERROR",detail:"The registration number is invalid.",life:8000})
+            return;
+        }
         student.value.regNo = res.data.student.regNo.toUpperCase()
         student.value.name = res.data.student.name
         student.value.faculty = utils.getFacultyById(res.data.student.faculty)
         student.value.department = utils.getDepartmentById(res.data.student.faculty,res.data.student.department)
         student.value.course = utils.getCourseById(res.data.student.faculty,res.data.student.department,res.data.student.course)
+        scrollToBottom()
     })
     .catch(err=>{
+        isSubmitting.value = false
         console.error(err)
     })
 }
@@ -271,11 +284,11 @@ const loadModel = async()=>{
 }
 
 const trainModel = async()=>{
+    update('uploading images for recognition...this may take a while')
     isTraining.value = true
     filesUrls.value.forEach( async (el)=>{
         const image = await faceapi.fetchImage(el)
         const detections = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor()
-        // console.log(detections.descriptor)
         if(detections){
             successImages.value.push(el)
             descriptions.value.push(detections.descriptor);
@@ -283,9 +296,10 @@ const trainModel = async()=>{
             failedImages.value.push(el)
         }
     })
-    console.log(descriptions.value)
     trainedData.value = new faceapi.LabeledFaceDescriptors(`${student.value.name} - ${student.value.regNo}` ,descriptions.value)  
     isTraining.value = false
+    scrollToBottom()
+    // toast.add({severity:"success",detail:'images uploaded sucessfull...proceed'})
 }
 
 const cleanData = async()=>{
@@ -319,23 +333,17 @@ const cleanData = async()=>{
             detections.forEach((element)=>{
                 const bestMatch = faceMatcher.findBestMatch(element.descriptor)
                 if(bestMatch['_label'] != 'match'){
-                    // step4.value = false
-                    console.log('one')
-                    // modelError.value = true
-                    // cleanData.value = false
                     return; 
-                    // alert('your images have different faces making it not suitable for a good model')
                 }else{
-                    console.log('two')
                     isStep4.value = true
                 }
             })
         }else{
-            alert('your images have different faces making it not suitable for a good model')
-            console.log('none')
-
+            toast.add({severity:"error",summary:"IMAGES ERROR",detail:"your images have different faces making it not suitable for a good model",life:7000})
+            // alert('your images have different faces making it not suitable for a good model')
         }
     })
+    scrollToBottom()
 }
 
 const uploadData = ()=>{
@@ -363,5 +371,15 @@ const uploadData = ()=>{
     .catch(err=>{
         console.error(err)
     })
+}
+
+function scrollToBottom(){
+    window.scrollTo({
+        top:document.body.scrollHeight,
+        behavior:"smooth"
+    })
+}
+function update(message){
+    toast.add({severity:"info",detail:message,life:5000})
 }
 </script>

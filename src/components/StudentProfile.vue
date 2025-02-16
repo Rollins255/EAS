@@ -20,6 +20,10 @@ watch(useUserStore(),()=>{
     student.value = useUserStore().user
 })
 function addUnit(){
+    if(unit.name == null || unit.code == null){
+        toast.add({severity:"error",summary:"Fill the form correctly",life:7000})
+        return;
+    }
     unit.value.code = unit.value.code.toUpperCase()
     axiosClient.post('/student/add-unit',unit.value)
     .then(res=>{
@@ -57,6 +61,7 @@ const confirm1 = (event,unit) => {
                 useStudentStore().setStudent(res.data.student)
                 useUserStore().setUser(res.data.student)
                 sessionStorage.setItem('student',JSON.stringify(res.data.student))
+                visible.value = false
             })
             .catch(err=>{
                 console.error(err)
@@ -73,7 +78,7 @@ const confirm1 = (event,unit) => {
     <ConfirmPopup></ConfirmPopup>
     <Toast></Toast>
     <div v-if="student">
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid sm:grid-cols-2  md:gap-4 gap-1">
             <div>
                 <p>
                     <span class="font-bold font-serif">Name:</span>
@@ -112,20 +117,20 @@ const confirm1 = (event,unit) => {
             </div>
         </div>
         <Divider></Divider>
-        <div class="flex">
-            <div class="my-5 w-3/4 text-center font-bold text-xl font-serif">
+        <div class="flex justify-between items-center">
+            <div class="my-5 md:w-3/4 text-center font-bold text-xl font-serif">
                 U N I T S
             </div>
-            <div class="w-1/4">
-                <Button severity="success" @click="visible = true" class="h-fit">
+            <div class="md:w-1/4">
+                <Button severity="success" @click="visible = true" class="h-fit text-nowrap">
                     <i class="pi pi-plus"></i> Add Unit
                 </Button>
             </div>
         </div>
-        <div class="grid sm:grid-cols-4 grid-cols-2 gap-5 text-center">
-         <div v-for="item in student.units" :key="item.id" class="bg-blue-600 cursor-pointer rounded-xl shadow-lg p-3 text-white ">
-            <div class="flex justify-end h-5 ">
-                <Button severity="danger" class="w-5" @click="confirm1($event,item)" > <i  class="pi pi-trash"></i>  </Button>
+        <div class="grid sm:grid-cols-4  gap-5 text-center">
+         <div v-for="item in student.units" :key="item.id" class="bg-slate-600 cursor-pointer rounded-xl shadow-lg p-3 text-white ">
+            <div class="flex justify-end h-10 ">
+                <Button severity="danger" class="w-10" @click="confirm1($event,item)" > <i  class="pi pi-trash"></i>  </Button>
             </div>
             <p class="font-bold text-2xl">{{ item.name }}</p>
             <p>{{item.code}}</p>
@@ -136,19 +141,43 @@ const confirm1 = (event,unit) => {
         <span class="text-surface-500 dark:text-surface-400 block ">Update your units.</span>
         <span class="text-xs mb-8">remember it must be unit that has a lecturer</span>
         <form @submit.prevent="addUnit">
-            <div class="flex items-center gap-4 mb-4">
+            <div class="md:flex items-center gap-4 mb-4">
                 <label for="name" class="font-semibold w-24">Unit name</label>
-                <InputText id="name" v-model="unit.name" class="flex-auto" autocomplete="off" />
+                <InputText id="name" required v-model="unit.name" class="flex-auto" autocomplete="off" />
             </div>
-            <div class="flex items-center gap-4 mb-8">
+            <div class="md:flex items-center gap-4 mb-8">
                 <label for="code" class="font-semibold w-24">Unit Code</label>
-                <InputText id="code" v-model="unit.code"  class="flex-auto" autocomplete="off" />
+                <InputText id="code" required v-model="unit.code"  class="flex-auto" autocomplete="off" />
             </div>
             <div class="flex justify-end gap-2">
                 <Button type="button" label="Cancel" severity="secondary" ></Button>
-                <Button type="submit" label="Save" @click="visible = false"></Button>
+                <Button type="submit" label="Save" ></Button>
             </div>
         </form>
     </Dialog>
     </div>
 </template>
+
+
+<style>
+.p-toast {
+  width: 90% !important; /* Default width for small screens */
+  max-width: 400px; /* Ensures it doesn't get too large */
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .p-toast {
+    width: 50% !important;
+    max-width: 500px;
+  }
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1024px) {
+  .p-toast {
+    width: 30% !important;
+    max-width: 600px;
+  }
+}
+</style>
