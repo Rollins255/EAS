@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.p-toast {
+  width: 90% !important; /* Default width for small screens */
+  max-width: 400px; /* Ensures it doesn't get too large */
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .p-toast {
+    width: 50% !important;
+    max-width: 500px;
+  }
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1024px) {
+  .p-toast {
+    width: 30% !important;
+    max-width: 600px;
+  }
+}
