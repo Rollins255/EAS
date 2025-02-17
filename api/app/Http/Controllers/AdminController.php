@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Lecture;
 use App\Models\Lecturer;
+use App\Models\Student;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,9 +49,46 @@ class AdminController extends Controller
     }
 
     /**
+     * get lecturers
+     */
+    function lecturers($faculty,$department){
+        logger()->info($faculty);
+        logger()->info($department);
+
+        $lecturers = Lecturer::where('faculty',$faculty)
+                        ->where('department',$department)
+                        ->get()
+                        ->map(function($data){
+                            return [
+                                'id' => $data->id,
+                                'department' => $data->department,
+                                'faculty' => $data->faculty,
+                                'email' => $data->email,
+                                'name' => $data->name,
+                                'staffNo' => $data->staffNo,
+                                'units' => $data->units->map(function($unit){
+                                    return [
+                                        'id' => $unit->id,
+                                        'code' => $unit->code,
+                                        'name' => $unit->name,
+                                        'course' => $unit->course,
+                                        'count' => $unit->count,
+                                    ];
+                                })
+                            ];
+                        })
+                        ;
+
+        return response()->json([
+            'lecturers' => $lecturers
+        ]);
+    }
+
+    /**
      * getting lecturer data
      */
     function lecturer(Request $request){
+        logger()->info($request);
         $lecturer = Lecturer::where('staffNo',$request->staffNo)
                     ->get()
                     ->map(function($data){
@@ -115,26 +153,69 @@ class AdminController extends Controller
     }
 
     /**
+     * reoving unit
+     */
+    function unitRemove(Request $request){
+        $request->validate([
+            'unit' => 'required'
+        ]);
+
+        Unit::where('code',$request->unit)
+                        ->where('lecturer',Auth::user()->staffNo)
+                        ->delete();
+        $data = [
+            'staffNo' => Auth::user()->staffNo
+        ];
+        return response()->json([
+            'lecturer' => $this->lecturer(new Request($data))->original
+        ]);
+    }
+
+    /**
      * unit history
      */
     function unitHistory($code){
-
+        
         $unit_id = Unit::where('code',$code)->get('id')[0];
         $lecture = Lecture::where('unit',$unit_id->id)
                             ->where('lecturer',Auth::user()->staffNo)
                             ->get()
-                            ->map(function($data){
+                            ->map(function($data) use ($code){
+
+                                logger()->info($code);
                                 return [
                                     'id' => $data->id,
                                     'venue' => $data->venue,
                                     'time' => $data->time,
-                                    'total' => Attendance::where('lecture',$data->id)->count()
+                                    'attendance' => Attendance::where('lecture',$data->id)->count(),
+                                    'total' => Student::whereJsonContains('units',$code)->count(),
                                 ];
                             });
 
 
         return response()->json([
             'history' => $lecture
+        ]);
+
+    }
+
+    /**
+     * unit information
+     */
+    function unitInfo($staffNo,$code){
+        $unit_id = Unit::where('code',$code)->get()[0];
+        logger()->info($unit_id);
+        
+        $unit_data = Lecture::where('unit',$unit_id->id)->get()[0];
+
+        // logger()->info(sizeof($unit_data) == 0? 'true':"false");
+        $unit_students = Student::whereJsonContains('units',$code)->count();
+        $unit_attendance =  Attendance::where('lecture',$unit_data->id)->count();
+
+        return response()->json([
+            'unit' =>$unit_data,
+            'total' => $unit_students,
+            'attendance' => $unit_attendance,
         ]);
 
     }

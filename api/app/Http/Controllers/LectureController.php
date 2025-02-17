@@ -10,6 +10,8 @@ use App\Models\Unit;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
+use function PHPUnit\Framework\isEmpty;
+
 class LectureController extends Controller
 {
     /**
@@ -27,7 +29,13 @@ class LectureController extends Controller
             // 'unitCode'=>['required'],
             // 'unitName'=>['required'],
         ]);
+        // check id the lecture table we have that unit 
 
+        // if yes - upadte the count
+
+        // if no - create the lecture
+        // $lecturer_data = Unit::where('id',$request->unit)->where('lecturer',$request->lecturer)->first();
+        // $lecturer_data = Lecture::where('unit',$request->unit)->where('lecturer',$request->lecturer)->first();
         $lecture = Lecture::create([
             'lecturer' => $request->lecturer,
             'venue' => $request->venue,
@@ -38,7 +46,9 @@ class LectureController extends Controller
             'unit' => $request->unit,
             // 'unitCode' => $request->unitCode,
         ]);
-
+        $data = Unit::where('id',$request->unit)->where('lecturer',$request->lecturer)->first();
+        $lecture = Unit::where('id',$request->unit)->where('lecturer',$request->lecturer)->update(['count'=>$data->count + 1]);
+       
         return response()->json($lecture);
     }
 
