@@ -12,15 +12,15 @@ const student = ref()
 const toast = useToast()
 const visible = ref(false)
 const unit = ref({
-    name:'',
-    code:'',
+    name:null,
+    code:null,
 })
 const confirm = useConfirm();
 watch(useUserStore(),()=>{
     student.value = useUserStore().user
 })
 function addUnit(){
-    if(unit.name == null || unit.code == null){
+    if(unit.value.name == null || unit.value.code == null){
         toast.add({severity:"error",summary:"Fill the form correctly",life:7000})
         return;
     }
@@ -29,8 +29,8 @@ function addUnit(){
     .then(res=>{
         show(unit.value.code)
         useUserStore().setUser(res.data.student)
-        unit.value.code = ''
-        unit.value.name = ''
+        unit.value.code = null
+        unit.value.name = null
         visible.value = false
     })
     .catch(err=>{

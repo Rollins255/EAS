@@ -34,7 +34,7 @@ const links = [
     // },
     {
         tag:'LECTURER',
-        link:'/add/new-lecturer'
+        link:'/lecturers'
     }
 ]
 function push(link){

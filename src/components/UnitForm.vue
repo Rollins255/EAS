@@ -79,7 +79,7 @@ function saveUnit(){
         emit('close')
     })
     .catch(err=>{
-        toast.add({severity:'danger',summary:'Unit not added',life:5000})
+        toast.add({severity:'error',summary:'Unit not added',life:5000})
         console.error(err)
     })
 }

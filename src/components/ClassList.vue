@@ -3,7 +3,11 @@
     <div class="card">
         <DataTable :value="data" show-gridlines="true" striped-rows="true" paginator :rows="50" :rowsPerPageOptions="[ 50,100,1000]" sortMode="multiple">
             <Column field="reg" sortable="true" header="Reg. No"></Column>
-            <Column field="name" sortable="true"  header="Name"></Column>
+            <Column field="name" sortable="true"  header="Name">
+                <!-- <template #body="slotProps">
+                    <p class="text-nowrap">{{ slotProps }}</p>
+                </template> -->
+            </Column>
             <Column field="time" sortable="true"  header="Time"></Column>
             <Column field="inClass" sortable="true"  header="Attended">
                 <template #body="slotProps">
@@ -21,7 +25,6 @@ import { DataTable,Column } from 'primevue';
 const {students} = defineProps({students:Array})
 const data =  ref([])
 watch(()=>students,()=>{
-    console.log(students)
     data.value = []
     students.forEach(el=>{
         data.value.push({

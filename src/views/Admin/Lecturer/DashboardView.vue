@@ -1,4 +1,5 @@
 <template>
+    <Toast></Toast>
     <nav-bar></nav-bar>
     <div class="flex justify-between w-[90%] mx-auto">
        <div class="text-center font-serif font-bold md:text-4xl text-2xl my-5">YOUR UNITS</div> 
@@ -11,12 +12,20 @@
         <div 
         v-if="useLecturerStore().lecturer"
         v-for="unit in useLecturerStore().lecturer.units"
-        @click="unitSelect(unit)"
-        class="bg-slate-300 w-[95%] py-3 cursor-pointer m-2 rounded shadow-lg mx-auto text-center"
+       
+        class="bg-blue-300 w-[95%] pt-3  m-2 rounded shadow-lg mx-auto text-center"
         >
-            <p class="text-4xl font-bold">{{unit.code}}</p>
-            <p class="font-bold  text-lg my-4">{{unit.name}}</p>
-            <p class="text-sm">{{getFacultyById(unit.faculty)}}</p>
+            <div class="flex justify-between w-[90%] mb-2">
+                <p class="ml-3">Lecture: {{ unit.count }}</p>
+                <Button @click="confirm2($event,unit.code)" severity="danger">
+                    <i class="pi pi-trash"></i>
+                </Button>
+            </div>
+            <div class="cursor-pointer bg-slate-600/10" @click="unitSelect(unit)" >
+                <p class="text-4xl font-bold">{{unit.code}}</p>
+                <p class="font-bold  text-lg my-4">{{unit.name}}</p>
+                <p class="text-sm">{{getFacultyById(unit.faculty)}}</p>
+            </div>
         </div>
         
     </div>
@@ -41,13 +50,17 @@
 import router from '@/router';
 import { useLecturerStore } from '@/stores/lecturer';
 import { onMounted,ref,watch } from 'vue';
-import {Button,Dialog,InputText,Select} from 'primevue'
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import {Button,Dialog,InputText,Select,Toast} from 'primevue'
 import UnitForm from '@/components/UnitForm.vue';
 import axiosClient from '@/axios/axios';
 import { getFacultyById, slugCreator } from '@/utils/utils';
 const data = ref()
 const visible = ref(false)
 const isLoading = ref(false)
+const confirm = useConfirm()
+const toast = useToast()
 onMounted(()=>{
     isLoading.value = true
     data.value = JSON.parse(sessionStorage.getItem('lecturer'))
@@ -63,5 +76,36 @@ onMounted(()=>{
 
 function unitSelect(value){
    router.replace(`/unit/${value.id}?unit=${value.name.toLowerCase()}&code=${value.code.toLowerCase()}&f=${value.faculty}&d=${value.department}&c=${value.course}`)
+}
+const confirm2 = (event,code) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Do you want to delete this unit?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            axiosClient.post('/remove-unit',{unit:code})
+            .then(res=>{
+                toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+                useLecturerStore().setLecturer(res.data.lecturer.lecturer[0])
+                emit('close')
+            })
+            .catch(err=>{
+                toast.add({severity:'error',summary:'Unit not added',life:5000})
+                console.error(err)
+            })
+        },
+        reject: () => {
+            // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
 }
 </script>

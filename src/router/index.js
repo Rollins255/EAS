@@ -47,22 +47,32 @@ const router = createRouter({
     {
       path:'/dashboard',
       name:'admin-dashboard',
-      component:()=>import ('@/views/Admin/AdminDashboardView.vue')
+      component:()=>import ('@/views/Admin/Admin/AdminDashboardView.vue')
     },
     {
       path:'/add/new-student',
       name:'new-student',
-      component:()=>import ('@/views/Admin/Learners/NewLearnerView.vue')
+      component:()=>import ('@/views/Admin/Admin/Learners/NewLearnerView.vue')
+    },
+    {
+      path:'/lecturers',
+      name:'lecturers-list',
+      component:()=>import('@/views/Admin/Admin/Lecturers/LecturersView.vue')
+    },
+    {
+      path:'/lecturer/:staffNo',
+      name:'lecturer-unit-view',
+      component:()=>import ('@/views/Admin/Admin/Lecturers/LecturerUnitView.vue')
     },
     {
       path:'/add/new-lecturer',
       name:'new-lecturer',
-      component:()=>import ('@/views/Admin/LecturerRegistrationForm.vue')
+      component:()=>import ('@/views/Admin/Admin/LecturerRegistrationForm.vue')
     },
     {
       path:'/student/update',
       name:'student-update',
-      component:()=>import ('@/views/Admin/Learners/UpdateLearnerView.vue')
+      component:()=>import ('@/views/Admin/Admin/Learners/UpdateLearnerView.vue')
     },
     {
       path:'/dashboard/lecturer',

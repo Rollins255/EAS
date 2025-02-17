@@ -1,8 +1,7 @@
 <template>
     <nav-bar/>
     <div class="h-[90vh] w-full">
-        
-        <div class="card flex justify-center">
+        <div class="card md:flex justify-center">
             <Breadcrumb :home="home" :model="items">
                 <template #item="{ item,props }">
                     <i @click="navPress('h')" v-if="item.icon" :class="[item.icon]"></i>
@@ -29,28 +28,48 @@
                 <p class="font-bold text-xl ">{{ department.label }}</p>
             </div>
         </div>
-        <div class="grid md:grid-cols-3 gap-3 m-5" v-if="courses && !units">
-            <div class="bg-green-200 hover:bg-green-400 rounded cursor-pointer h-[30vh] flex items-center justify-center
-             text-center"
-                @click="courseSelect(course)"
-                v-for="course in courses"
-            >
-                <p class="font-bold text-xl ">{{ course.label }}</p>
-            </div>
-        </div>
-        <div class="grid md:grid-cols-3 gap-3 m-5" v-if="units">
+        
+        <div class="grid md:grid-cols-3 gap-3 m-5" v-if="lecturers">
             <div class="bg-green-400 hover:bg-green-600 rounded cursor-pointer h-[30vh] flex items-center justify-center
              text-center"
-                @click="unitSelect(unit)"
-                v-for="unit in units"
+               @click="visible = true,dialogData = lecturer"
+                v-for="lecturer in lecturers"
             >
                 <div>
-                    <p class="font-bold text-3xl ">{{ unit.code }}</p>
-                    <p class="text-xl ">{{ unit.name }}</p>
+                    <p class="font-bold text-3xl ">{{lecturer.name.toUpperCase()}}</p>
+                    <p class="text-xl ">{{ lecturer.staffNo.toUpperCase() }}</p>
+                    <p class="text-lg ">No of units: {{ lecturer.units.length }}</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <Dialog v-model:visible="visible" modal header="Lecturer Units" class="md:w-fit w-[95%] md:min-w-[40%]" >
+        <!-- <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your information.</span> -->
+        
+        <div class="flex bg-slate-100 rounded-lg mb-3 justify-around">
+            <p class="font-bold">{{ dialogData.name.toUpperCase() }}</p>
+            <p class="font-bold">{{ dialogData.staffNo.toUpperCase() }}</p>
+        </div>
+        <div class="card" v-if="dialogData.units.length == 0">
+            <p class="text-center text-sm font-serif">Lecturer has no units teaching.</p>
+        </div>
+        <div class="card" v-else>
+            <DataTable :value="dialogData.units" size="small" showGridlines stripedRows  >
+                <Column class="cursor-pointer hover:bg-blue-200" field="code" header="Code">
+                    <template #body="{data}">
+                        <p @click="unitView(data)" >{{ data.code }}</p>
+                    </template>
+                </Column>
+                <Column field="name" header="Name"></Column>
+                <Column field="course" header="Course">
+                    <template #body="{data}" >
+                        <p class="text-nowrap">{{ utils.getCourseById(items[0].label.id,items[1].label.id,data.course) }}</p>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+    </Dialog>
 </template>
 
 <script setup>
@@ -58,10 +77,15 @@ import { onMounted, ref } from 'vue'
 const departments = ref()
 const courses = ref()
 const units = ref()
+const visible = ref(false)
+const dialogData = ref()
 import { Breadcrumb } from 'primevue'
 import router from '@/router';
 import * as utils from '@/utils/utils'
 import axiosClient from '@/axios/axios'
+import { useLecturerStore } from '@/stores/lecturer'
+import {Dialog,DataTable,Column} from 'primevue'
+const lecturers = ref()
 const home = ref({
     icon: 'pi pi-home'
 });
@@ -90,7 +114,9 @@ function departmentSelect(value){
             items.value[1] = {label:el,tag:'d'}
             courses.value = el.courses
         }
+        
     })
+    getLecturers()
 }
 
 function courseSelect(value){
@@ -112,9 +138,6 @@ function courseSelect(value){
     .catch(err=>{
         console.error(err)
     })
-    
-
-    // router.replace('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+value)
 }
 function unitSelect(value){
     // console.log(value)
@@ -143,4 +166,21 @@ function navPress(value){
     
 }
 
+function getLecturers(){
+    let data = 11
+    console.log(items.value[0].label.id)
+    console.log(items.value[1].label.id)
+    axiosClient.get(`/lecturers/${items.value[0].label.id}/${items.value[1].label.id}`)
+    .then(res=>{
+        useLecturerStore().setLecturersData(res.data.lecturers)
+        // console.log(res.data.lecturers)
+        lecturers.value = res.data.lecturers
+    })
+    .catch(err=>{
+        console.error(err)
+    })
+}
+function unitView(value){
+    router.push(`/lecturer/${dialogData.value.staffNo}?code=${value.code}&unit=${value.name.toLowerCase()}`)
+}
 </script>

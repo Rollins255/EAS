@@ -1,6 +1,6 @@
 <template>
+    <Toast></Toast>
     <nav-bar/>
-    <!-- {{ useRoute() }} -->
     <div class="w-full">
         <p class="w-fit pl-2 pr-5 bg-black-200 rounded m-2" @click="router.push('/')">
             <i class="pi pi-angle-left px-2"></i>
@@ -38,7 +38,10 @@
                                     <label for="on_label">Venue</label>
                                 </FloatLabel>
                                 <div class="mx-auto flex justify-center">
-                                    <Button type="submit" class="w-1/2">S U B M I T</Button>
+                                    <Button v-if="!isSubmitting" type="submit" class="w-1/2">S U B M I T</Button>
+                                    <Button v-else type="button" class=" w-1/4 mx-auto text-nowrap">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="white"><circle cx="12" cy="3.5" r="2"><animateTransform attributeName="transform" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="0 12 12;90 12 12;180 12 12;270 12 12"/><animate attributeName="opacity" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle><circle cx="12" cy="3.5" r="1.5" transform="rotate(30 12 12)"><animateTransform attributeName="transform" begin="0.2s" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="30 12 12;120 12 12;210 12 12;300 12 12"/><animate attributeName="opacity" begin="0.2s" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle><circle cx="12" cy="3.5" r="1.5" transform="rotate(60 12 12)"><animateTransform attributeName="transform" begin="0.4s" calcMode="discrete" dur="2.4s" repeatCount="indefinite" type="rotate" values="60 12 12;150 12 12;240 12 12;330 12 12"/><animate attributeName="opacity" begin="0.4s" dur="0.6s" repeatCount="indefinite" values="1;1;0"/></circle></g></svg>
+                                    </Button>
                                 </div>
                             </form>
                         </TabPanel>
@@ -56,14 +59,17 @@
 <script setup>
 import { onMounted,watch, ref } from 'vue';
 import UnitsHistory from '@/components/UnitsHistory.vue'
-import { FloatLabel,Select,Button,Tabs,Tab,TabList,TabPanels,TabPanel } from 'primevue';
+import { FloatLabel,Select,Button,Tabs,Tab,TabList,TabPanels,TabPanel,Toast } from 'primevue';
 import axiosClient from '@/axios/axios';
+import { useToast } from 'primevue/usetoast';
 import { useRoute, useRouter } from 'vue-router';
 import { getCourseById, getCourses, getDepartmentById, getFacultyById } from '@/utils/utils';
 import { useLecturerStore } from '@/stores/lecturer';
 import router from '@/router';
+const toast = useToast()
 const route = useRoute()
 const history = ref()
+const isSubmitting = ref(false)
 const lecture = ref({
     venue:null,
     class_time:null
@@ -95,8 +101,12 @@ setTimeout(()=>{
 },2000)
 
 const onSubmit = ()=>{
+    isSubmitting.value = true
+    if(lecture.value.venue == null || lecture.value.class_time ==null){
+        toast.add({severity:"warn",summary:"Fill the form correctly",life:6000})
+        return;
+    }
     let lect = {
-        // 'course':lecture.value.course.name,
         'venue':lecture.value.venue.name,
         'time':lecture.value.class_time.name,
         'lecturer':useLecturerStore().lecturer.staffNo,
@@ -108,9 +118,14 @@ const onSubmit = ()=>{
     }
     axiosClient.post('/set-class',lect)
     .then(res=>{
-        console.log(res)
+        isSubmitting.value = false
+        toast.add({severity:"success",summary:"Lecture set successfully",life:5000})
+        lecture.value.venue = null
+        lecture.value.class_time = null
+        router.push('/')
     })
     .catch(err=>{
+        isSubmitting.value = false
         console.error(err)
     })
 }
