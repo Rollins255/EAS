@@ -21,8 +21,8 @@ class Lecture extends Model
     ];
 
 
-    function unit():HasOne
+    function units():HasOne
     {
-        return $this->hasOne(Unit::class,'id','unitsss');
+        return $this->hasOne(Unit::class,'id','unit');
     }
 }

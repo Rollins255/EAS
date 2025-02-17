@@ -29,7 +29,7 @@
                 <p class="font-bold text-xl ">{{ department.label }}</p>
             </div>
         </div>
-        <div class="grid md:grid-cols-3 gap-3 m-5" v-if="courses && !units">
+        <div class="grid md:grid-cols-3 gap-3 m-5" v-if="courses && units.length == 0">
             <div class="bg-green-200 hover:bg-green-400 rounded cursor-pointer h-[30vh] flex items-center justify-center
              text-center"
                 @click="courseSelect(course)"
@@ -41,12 +41,16 @@
         <div class="grid md:grid-cols-3 gap-3 m-5" v-if="units">
             <div class="bg-green-400 hover:bg-green-600 rounded cursor-pointer h-[30vh] flex items-center justify-center
              text-center"
-                @click="unitSelect(unit)"
+                @click="unitSelect(unit.unit[0])"
                 v-for="unit in units"
             >
+            <!-- {{ unit.unit }} -->
                 <div>
-                    <p class="font-bold text-3xl ">{{ unit.code }}</p>
-                    <p class="text-xl ">{{ unit.name }}</p>
+                    <p>Time:{{ unit.time }}</p>
+                    <p class="font-bold text-3xl ">{{ unit.unit[0].code }}</p>
+                    <p class="text-xl ">{{ unit.unit[0].name  }}</p>
+                    <p>{{ unit.venue }}</p>
+                    <!-- <p>lecture:{{ unit.unit[0].count }}</p> -->
                 </div>
             </div>
         </div>
@@ -57,7 +61,7 @@
 import { onMounted, ref } from 'vue'
 const departments = ref()
 const courses = ref()
-const units = ref()
+const units = ref([])
 import { Breadcrumb } from 'primevue'
 import router from '@/router';
 import * as utils from '@/utils/utils'
@@ -107,7 +111,12 @@ function courseSelect(value){
     axiosClient.post('/units/',data)
     .then(res=>{
         console.log(res.data)
-        units.value = res.data.units
+        res.data.lectures.forEach(element=>{
+            if(element.unit.length != 0){
+                units.value.push(element)
+            }
+        })
+        // units.value = res.data.units
     })
     .catch(err=>{
         console.error(err)
@@ -117,8 +126,8 @@ function courseSelect(value){
     // router.replace('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+value)
 }
 function unitSelect(value){
-    // console.log(value)
-    router.push('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+items.value[2].label.label_tag+"/"+value.code+"?name="+value.name)
+    console.log(value)
+    router.push('/class/attendance/'+items.value[0].label.label_tag+"/"+items.value[1].label.label_tag+"/"+items.value[2].label.label_tag+"/"+value.code+"?name="+value.name+"&id="+value.id)
 }
 
 function navPress(value){

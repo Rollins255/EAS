@@ -205,17 +205,40 @@ class AdminController extends Controller
     function unitInfo($staffNo,$code){
         $unit_id = Unit::where('code',$code)->get()[0];
         logger()->info($unit_id);
-        
-        $unit_data = Lecture::where('unit',$unit_id->id)->get()[0];
+        $students = Student::whereJsonContains('units',$code)->count();
+        $unit_data = Lecture::where('unit',$unit_id->id)
+                            ->get()
+                            ->map(function($data) use($students){
+                                return [
+                                    'id' => $data->id,
+                                    'lecturer' => $data->lecturer,
+                                    'venue' => $data->venue,
+                                    'time' => $data->time,
+                                    'students' => $students,
+                                    'attendance' => Attendance::where('lecture',$data->id)->count(),
+                                    'unit' => Unit::where('id',$data->unit)
+                                                    ->get()
+                                                    ->map(function($unit){
+                                                        return [
+                                                            'id'=> $unit->id,
+                                                            'name'=> $unit->name,
+                                                            'code'=> $unit->code,
+                                                            'lecturer'=> $unit->lecturer,
+                                                            'course'=> $unit->course,
+                                                        ];
+                                                    })
+                                ];
+                            })
+                            ;
 
         // logger()->info(sizeof($unit_data) == 0? 'true':"false");
-        $unit_students = Student::whereJsonContains('units',$code)->count();
-        $unit_attendance =  Attendance::where('lecture',$unit_data->id)->count();
+        // $unit_students = Student::whereJsonContains('units',$code)->count();
+        // $unit_attendance =  Attendance::where('lecture',$unit_data->id)->count();
 
         return response()->json([
-            'unit' =>$unit_data,
-            'total' => $unit_students,
-            'attendance' => $unit_attendance,
+            'units' =>$unit_data,
+            // 'total' => $unit_students,
+            // 'attendance' => $unit_attendance,
         ]);
 
     }

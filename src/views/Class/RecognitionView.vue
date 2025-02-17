@@ -80,7 +80,8 @@ const getStudents = async () => {
             getDepartment(useRoute().params.f, useRoute().params.d),
             getCourse(useRoute().params.f, useRoute().params.d, useRoute().params.c)
         ),
-        unitCode:useRoute().params.u
+        unitCode:useRoute().params.u,
+        lecture: useRoute().query.id
     }
     await axiosClient.post('/get-students', courseData.value)
         .then(res => {
@@ -99,11 +100,10 @@ const markAttendance = (value) => {
     let user = {
         data: courseData.value,
         regNo: value.split('-')[1],
-        lecture: 1
+        lecture: useRoute().query.id
     }
     axiosClient.post('/mark-attendance', user)
         .then(res => {
-
             if (res.data.message == 'present') {
                 show('success','PRESENT',res.data.student[0].name +" "+ res.data.student[0].regNo)
                 studentData.value = res.data.students

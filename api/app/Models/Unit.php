@@ -29,6 +29,6 @@ class Unit extends Model
 
     function lecture():BelongsTo
     {
-        return $this->belongsTo(Lecture::class,'unitsss','id');
+        return $this->belongsTo(Lecture::class,'unit','id');
     }
 }

@@ -1,15 +1,22 @@
 <template>
 <nav-bar></nav-bar> 
-<div class="card">
+<div>
+    <div class="grid md:grid-cols-2 md:w-3/4 md:mx-auto py-5">
+        <p class="font-bold font-serif">UNIT NAME: <span class="font-thin">{{ route.query.unit.toUpperCase()}}</span></p>
+        <p class="font-bold font-serif">UNIT CODE: <span  class="font-thin">{{ route.query.code.toUpperCase()}}</span></p>
+    </div>
+</div>
+<div class="card md:w-3/4 md:mx-auto">
     <DataTable :value="data" size="small" showGridlines stripedRows  >
-        <Column  field="venue" header="Code"></Column>
-        <Column field="time" header="Name"></Column>
-        <Column field="attendance" header="Course">
-            <!-- <template #body="{data}" >
-                <p class="text-nowrap">{{ utils.getCourseById(items[0].label.id,items[1].label.id,data.course) }}</p>
-            </template> -->
-        </Column>
+        <Column  field="venue" header="Venue"></Column>
+        <Column field="time" header="Time"></Column>
+        <Column field="attendance" header="Attendance"></Column>
         <Column field="total" header="Total"></Column>
+        <Column field="total"  header="Rate">
+            <template #body="slotProps">
+                <p>{{ slotProps.data.attendance / slotProps.data.total }}%</p>
+            </template>
+        </Column>
     </DataTable>
 </div>
 </template>
@@ -17,31 +24,24 @@
 <script setup>
 import axiosClient from '@/axios/axios';
 import { DataTable,Column } from 'primevue';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-let data = [
-   {
-    venue:'one',
-    time:"11-1",
-    total:100,
-    attendance:20,
-   }
-]
+let data = ref([])
 const route = useRoute()
 onMounted(()=>{
     axiosClient.get(`/unit-info/${route.params.staffNo}/${route.query.code}`)
     .then(res=>{
         console.log(res.data)
         // data.value = 0
-        res.data.forEach(element => {
-            c
+        res.data.units.forEach(element => {
+            console.log(element)
             let obj = {
-                venue:element.unit.venue,
-                time:element.unit.time,
-                total:element.total,
+                venue:element.venue,
+                time:element.time,
+                total:element.students,
                 attendance:element.attendance,
             }
-            data.value = obj
+            data.value.push(obj)
         });
     })
     .catch(err=>{

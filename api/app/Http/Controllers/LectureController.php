@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Unit;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -57,7 +58,7 @@ class LectureController extends Controller
      */
     function units(Request $request){
         date_default_timezone_set('Africa/Nairobi');
-        logger()->info(date('Y-m-d H:i:s'));
+        // logger()->info(date('Y-m-d H:i:s'));
         $units = Unit::where('faculty',$request->f)
                 ->where('department',$request->d)
                 ->where('course',$request->c)
@@ -71,8 +72,21 @@ class LectureController extends Controller
                         'lecturer' => $data->lecturer,
                     ];
                 });
+        $lecture = Lecture::where('lecturer',Auth::user()->staffNo)
+                            ->get()
+                            ->map(function($data){
+                                return [
+                                    'id' => $data->id,
+                                    'lecturer' => $data->lecturer,
+                                    'venue' => $data->venue,
+                                    'time' => $data->time,
+                                    'unit' => Unit::where('id',$data->unit)->get(),
+                                ];
+                            })
+                            ;
         return response()->json([
-            'units' => $units
+            'units' => $units,
+            'lectures' => $lecture
         ]);
     }
 
@@ -82,17 +96,17 @@ class LectureController extends Controller
      * getting students for a lecture
      */
     function start(Request $request){
-        logger()->info($request);
-        $data =  Student::where('faculty',$request->faculty)
-                        ->where('department',$request->department)
-                        ->where('course',$request->course)->get();
-        logger()->info($data);
+        // $data =  Student::where('faculty',$request->faculty)
+        //                 ->where('department',$request->department)
+        //                 ->where('course',$request->course)->get();
+        // logger()->info($re);
         $students = Student::where('faculty',$request->faculty)
                             ->where('department',$request->department)
                             ->where('course',$request->course)
                             ->whereJsonContains('units',$request->unitCode)
                             ->get()
-                            ->map(function($student){
+                            ->map(function($student) use($request){
+                                // logger()->info($student);
                                 return [
                                     'id'=> $student->id,
                                     'name'=> $student->name,
@@ -101,10 +115,10 @@ class LectureController extends Controller
                                     'department'=> $student->department,
                                     'course'=> $student->course,
                                     'units'=> $student->units,
-                                    'present'=> Attendance::where('lecture',1)->where('student',$student->regNo)->first() == null ? false : true,
-                                    'clockIn'=> Attendance::where('lecture',1)->where('student',$student->regNo)->first() == null 
+                                    'present'=> Attendance::where('lecture',$request->lecture)->where('student',$student->regNo)->first() == null ? false : true,
+                                    'clockIn'=> Attendance::where('lecture',$request->lecture)->where('student',$student->regNo)->first() == null 
                                                 ?'-- --' 
-                                                : Attendance::where('lecture', 1)->where('student', $student->regNo)->first()->clockIn,
+                                                : Attendance::where('lecture', $request->lecture)->where('student', $student->regNo)->first()->clockIn,
                                     'facials' => Facial::where('student',$student->regNo)->first()
                                 ];
                             });
