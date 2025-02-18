@@ -14,7 +14,7 @@
         <Column field="total" header="Total"></Column>
         <Column field="total"  header="Rate">
             <template #body="slotProps">
-                <p>{{ slotProps.data.attendance / slotProps.data.total }}%</p>
+                <p>{{ (slotProps.data.attendance / slotProps.data.total)*100 }}%</p>
             </template>
         </Column>
     </DataTable>
