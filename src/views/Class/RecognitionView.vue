@@ -58,6 +58,7 @@ const isLive = ref(false)
 const studentData = ref([])
 const isDataReady = ref(false)
 const courseData = ref()
+const route = useRoute()
 const labelFaceDescriptors = ref()
 onMounted(async () => {
     await getStudents()
@@ -97,10 +98,11 @@ const getStudents = async () => {
 }
 
 const markAttendance = (value) => {
+    // console.log(route.query.id)
     let user = {
         data: courseData.value,
         regNo: value.split('-')[1],
-        lecture: useRoute().query.id
+        lecture: route.query.id
     }
     axiosClient.post('/mark-attendance', user)
         .then(res => {
