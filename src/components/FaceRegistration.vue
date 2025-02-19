@@ -141,7 +141,7 @@
                 <!-- STEP 4 -->
                 <div v-if="isStep4">
                     <div>
-                        <p>Step 4. All done.</p>
+                        <p class="text-center  py-5">Step 4. All done.</p>
                     </div>
                     <div>
                         <p class="text-center py-5">The images are all good</p>
