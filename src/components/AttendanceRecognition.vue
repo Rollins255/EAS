@@ -13,7 +13,7 @@ import axiosClient from '@/axios/axios';
 import { useClassListStore } from '@/stores/classList';
 const toast = useToast();
 const video = ref()
-const camera = ref('environment')
+const camera = ref('user')
 const stream = ref()
 const labels = ref([])
 const sure = ref([])
