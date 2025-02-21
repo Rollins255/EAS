@@ -127,6 +127,7 @@ router.beforeEach((to, from, next) => {
             '/register',
             '/lecturer/login',
             '/student/login',
+            // '/class/setup'
         ];
 
   const studentPages = [
