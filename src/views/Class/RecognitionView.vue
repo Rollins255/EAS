@@ -1,6 +1,6 @@
 <template>
     <nav-bar></nav-bar>
-    <Toast />
+    <Toast :maxToasts="3" />
     <div class="grid grid-cols-2 w-3/4 mx-auto gap-3 my-4">
         <div>
             <span class="font-bold">Faculty:</span>
