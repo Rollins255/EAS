@@ -20,13 +20,12 @@
             </p>
         </div>
     </div>
-
-    <div v-if="student.regNo != null" class="bg-red-300 ">
+    <div v-if="student.regNo != null">
         <!-- STEP 1 -->
         <div>
             <p class="text-center  py-5">Step 1. Upload similar face images of the same person atleast 3 images.</p>
         </div>
-        <div class="card mx-auto sm:w-3/4" >
+        <div class="card mx-auto" >
             <FileUpload name="demo[]" url="/api/upload" @upload="onTemplatedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" @select="onSelectedFiles">
                 <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                     <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
@@ -41,11 +40,11 @@
                     </div>
                 </template>
                 <template #content="{ files, removeUploadedFileCallback, removeFileCallback }">
-                    <div class="flex flex-col gap-8 pt-4">
-                        <div v-if="files.length > 0">
+                    <div class="flex flex-col gap-8 pt-4" >
+                        <div v-if="readyFiles.length >  0">
                             <h5>Pending</h5>
                             <div class="flex flex-wrap gap-4">
-                                <div v-for="(file, index) of files" :key="file.name + file.type + file.size" class="p-8 rounded-border flex flex-col border border-surface items-center gap-4">
+                                <div v-for="(file, index) of readyFiles" :key="file.name + file.type + file.size" class="p-4 rounded-border flex flex-col border border-surface items-center gap-4">
                                     <div>
                                         <img role="presentation" :alt="file.name" :src="file.objectURL" width="100" height="50" />
                                     </div>
@@ -56,11 +55,11 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div v-if="uploadedFiles.length > 0">
                             <h5>Completed</h5>
                             <div class="flex flex-wrap gap-4">
-                                <div v-for="(file, index) of uploadedFiles" :key="file.name + file.type + file.size" class="p-8 rounded-border flex flex-col border border-surface items-center gap-4">
+                                <div v-for="(file, index) of uploadedFiles" :key="file.name + file.type + file.size" class="p-4 rounded-border flex flex-col border border-surface items-center gap-4">
                                     <div>
                                         <img role="presentation" :alt="file.name" :src="file.objectURL" width="100" height="50" />
                                     </div>
@@ -88,7 +87,7 @@
             <div>
                 <p class="text-center  py-5">Step 2. Upload the images  for recognition.</p>
             </div>
-            <div class="w-4/5 border rounded mx-auto p-5 pt-10" >
+            <div class=" border rounded mx-auto p-5 pt-10" >
                 <div  v-if="useLoadingStore().loading != '100%'" class="md:flex justify-center items-center text-center">
                     <p class="md:mr-5 ">
                         Load the model first
@@ -99,7 +98,7 @@
                 <div v-if="useLoadingStore().loading == '100%' && !isModelLoading">
                     <p class="text-center font-bold py-5 text-xl">Model loaded <i class="pi pi-thumbs-up" style="font-size:2rem ;"></i> </p>
                     <div class="w-full flex">
-                       
+                  
                         <Button @click="trainModel" v-if="!isTraining" class="mx-auto">Upload the images</Button>
                         <Button v-else class="mx-auto" severity="warn">U p l o a d i n g. . . .</Button>
                     </div>
@@ -114,7 +113,7 @@
                 <div>
                     <p class="text-center  py-5">Step 3. Clean the images.</p>
                 </div>
-                <div class="md:w-4/5 shadow mx-auto p-5 max-h-[75vh] min-h-[45vh] overflow-auto">
+                <div class="shadow mx-auto p-5 max-h-[75vh] min-h-[45vh] overflow-auto">
                     <Tabs value="0">
                         <TabList>
                             <Tab value="0">CLEAR IMAGES</Tab>
@@ -178,6 +177,7 @@ const totalSizePercent = ref(0);
 const files = ref([]);
 const filesUrls = ref([]);
 const uploadedFiles = ref([])
+const readyFiles = ref([])
 const successImages = ref([])
 const failedImages = ref([])
 const descriptions = ref([])
@@ -232,7 +232,7 @@ const onClearTemplatingUpload = (clear) => {
 
 const onSelectedFiles = (event) => {
     files.value = event.files;
-    
+    readyFiles.value = event.files;
     files.value.forEach((file) => {
         totalSize.value += parseInt(formatSize(file.size));
         // filesUrls.value.push(file.objectURL)
@@ -241,12 +241,13 @@ const onSelectedFiles = (event) => {
 
 const uploadEvent = (callback) => {
     totalSizePercent.value = totalSize.value / 10;
-    files.value.forEach((file) => {
+    readyFiles.value.forEach((file) => {
         // totalSize.value += parseInt(formatSize(file.size));
         uploadedFiles.value.push(file)
         filesUrls.value.push(file.objectURL)
+        readyFiles.value = readyFiles.value.filter(item => item !== file)
     });
-    callback();
+    // callback();
 };
 
 const onTemplatedUpload = () => {
@@ -284,26 +285,50 @@ const loadModel = async()=>{
 }
 
 const trainModel = async()=>{
-    update('uploading images for recognition...this may take a while')
+    if(filesUrls.value.length == 0){
+        update('warn','IMAGES ERROR','please make sure the images are uploaded')
+        isTraining.value = false;
+        return;
+    }
+    update('info','RECOGNITION','Uploading images for recognition...this may take a while')
     isTraining.value = true
-    filesUrls.value.forEach( async (el)=>{
-        const image = await faceapi.fetchImage(el)
-        const detections = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor()
-        if(detections){
-            successImages.value.push(el)
-            descriptions.value.push(detections.descriptor);
-        }else{
-            failedImages.value.push(el)
-        }
+    let totalItems = filesUrls.value.length
+    let count = ref(0)
+    watch(count.value,()=>{
+        console.log(count.value)
     })
-    trainedData.value = new faceapi.LabeledFaceDescriptors(`${student.value.name} - ${student.value.regNo}` ,descriptions.value)  
-    isTraining.value = false
-    scrollToBottom()
-    // toast.add({severity:"success",detail:'images uploaded sucessfull...proceed'})
+    setTimeout(() => {
+        filesUrls.value.forEach( async (el)=>{
+            const image = await faceapi.fetchImage(el)
+            const detections = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor()
+            if(detections){
+                successImages.value.push(el)
+                console.log(el)
+                descriptions.value.push(detections.descriptor);
+                scrollToBottom()
+            }else{
+                failedImages.value.push(el)
+                scrollToBottom()
+            }
+            count.value++
+            if(totalItems == count.value){
+                isTraining.value = false
+                scrollToBottom()
+                update('success','SUCCESS','Images uploaded sucessfully')
+                setTimeout(() => {
+                    update('info','','Proceed to image confirmation')
+                }, 2500);
+            }
+        })
+        trainedData.value = new faceapi.LabeledFaceDescriptors(`${student.value.name} - ${student.value.regNo}` ,descriptions.value)  
+        
+        scrollToBottom()
+    }, 2000);
 }
 
 const cleanData = async()=>{
-    let maxScore = [0,0]
+    toast.removeAllGroups()
+    update('info','CONFIRMATION','Image cofirmation in progress . . .')
     let index = 0
     let scores = ref([])
     successImages.value.forEach(async(element)=>{
@@ -338,9 +363,16 @@ const cleanData = async()=>{
                     isStep4.value = true
                 }
             })
+            toast.removeAllGroups()
+            update('success','SUCCESS','Image confirmation Done!')
+            scrollToBottom()
+            setTimeout(()=>{
+                toast.removeAllGroups()
+                update('info','FINAL STEP','Press the "ALL GOOD👍✨" button to save the data')
+            },1000)
         }else{
             toast.add({severity:"error",summary:"IMAGES ERROR",detail:"your images have different faces making it not suitable for a good model",life:7000})
-            // alert('your images have different faces making it not suitable for a good model')
+            return;
         }
     })
     scrollToBottom()
@@ -367,6 +399,7 @@ const uploadData = ()=>{
         student.value.faculty = null
         student.value.department = null
         student.value.course = null
+        toast.add({severity:'success',summary:'REGISTRATION DONE!',detail:'Student is enrolled',life:5000,closable:false})
     })
     .catch(err=>{
         console.error(err)
@@ -379,7 +412,7 @@ function scrollToBottom(){
         behavior:"smooth"
     })
 }
-function update(message){
-    toast.add({severity:"info",detail:message,life:5000})
+function update(severity,summary,message){
+    toast.add({severity:severity,summary:summary,detail:message,life:5000})
 }
 </script>
