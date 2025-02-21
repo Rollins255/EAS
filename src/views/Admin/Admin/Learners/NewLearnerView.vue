@@ -1,4 +1,5 @@
 <template>
+    <Toast></Toast>
     <nav-bar/>
     <div>
         <h1 class="font-bold text-center md:text-3xl text-xl py-4 font-serif">REGISTER LEARNER</h1>
@@ -30,13 +31,28 @@
 
 </template>
 <script setup>
-import { Stepper,StepList,StepPanels,StepItem,Step,StepPanel } from 'primevue';
+import { Stepper,StepList,StepPanels,StepItem,Step,StepPanel,Toast } from 'primevue';
 import RegistarionForm from '@/components/RegistarionForm.vue';
 import FaceRegistration from '@/components/FaceRegistration.vue';
 import { useStudentStore } from '@/stores/student';
+import { useToast } from 'primevue/usetoast';
 import {ref} from 'vue'
+const toast = useToast()
 const tab_value  = ref("1")
 function setValue(){
     tab_value.value = "2"
+    show('success','Registration Done!!','Students details saved,proceed to face registration',5000)
+    setTimeout(() => {
+        show(
+            'info',
+            'How to proceed??',
+            'Press submit to to finish on facial registartion for the student',
+            8000)
+
+    }, 2000);
+}
+
+function show(severity,summary,detail,life){
+    toast.add({severity:severity,summary:summary,detail:detail,life:life})
 }
 </script>
