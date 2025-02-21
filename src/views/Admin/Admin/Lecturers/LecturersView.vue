@@ -2,12 +2,15 @@
     <nav-bar/>
     <div class="h-[90vh] w-full">
         <div class="card md:flex justify-center">
-            <Breadcrumb :home="home" :model="items">
+            <Breadcrumb class="w-3/4" :home="home" :model="items">
                 <template #item="{ item,props }">
                     <i @click="navPress('h')" v-if="item.icon" :class="[item.icon]"></i>
                     <p  v-if="item.label" class="cursor-pointer" @click="navPress(item.tag)">{{ item.label.label }}</p>
                 </template>
             </Breadcrumb>
+            <Button class="h-fit my-auto" @click="router.push('/add/new-lecturer')">
+                <i class="pi pi-plus"> NEW LECTURER</i>
+            </Button>
         </div>
         <div class="grid md:grid-cols-3 gap-3 m-5"  v-if="!departments">
             <div class="bg-blue-200 hover:bg-blue-400 rounded cursor-pointer h-[30vh] flex items-center justify-center
@@ -84,7 +87,7 @@ import router from '@/router';
 import * as utils from '@/utils/utils'
 import axiosClient from '@/axios/axios'
 import { useLecturerStore } from '@/stores/lecturer'
-import {Dialog,DataTable,Column} from 'primevue'
+import {Dialog,DataTable,Column,Button} from 'primevue'
 const lecturers = ref()
 const home = ref({
     icon: 'pi pi-home'
