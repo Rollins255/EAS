@@ -49,7 +49,7 @@ services:
             timeout: 5s
     frontend: # New service for the frontend
         build:
-            context: ../
+            context: /mnt/wsl/docker-desktop-bind-mounts/Ubuntu/7250ce2e545193719d9c921b02d5709c84c75e5d763b634eac5270fb854279ea
             dockerfile: Dockerfile.frontend # Create this file (see below)
         ports:
             - '5173:5173' # Match the host port
