@@ -6,12 +6,13 @@ import { onMounted, watch,ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import axiosClient from '@/axios/axios';
 import { useStudentStore } from '@/stores/student';
-const student = ref()
+const unitList = ref()
 onMounted(()=>{
     axiosClient.get('/student')
     .then(res=>{
         useStudentStore().setStudent(res.data.student)
         useUserStore().setUser(res.data.student)
+        unitList.value = res.data.unitList
         sessionStorage.setItem('student',JSON.stringify(res.data.student))
     })
     .catch(err=>{
@@ -38,7 +39,7 @@ onMounted(()=>{
         </TabList>
         <TabPanels>
             <TabPanel value="0">
-                <student-profile></student-profile>
+                <student-profile  :unit-list="unitList"></student-profile>
             </TabPanel>
             <TabPanel value="1">
                 <student-history></student-history>

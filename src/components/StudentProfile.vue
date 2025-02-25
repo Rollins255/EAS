@@ -1,13 +1,13 @@
 <script setup>
 import { useUserStore } from '@/stores/user';
 import { getCourseById, getDepartmentById, getFacultyById } from '@/utils/utils';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, warn, watch } from 'vue';
 import { Divider,Button,InputText,Dialog,Toast,ConfirmPopup } from 'primevue';
 import { useToast } from 'primevue';
 import axiosClient from '@/axios/axios';
 import { useConfirm } from "primevue/useconfirm";
 import { useStudentStore } from '@/stores/student';
-const props = defineProps({student:Object})
+const props = defineProps({unitList:Object})
 const student = ref()
 const toast = useToast()
 const visible = ref(false)
@@ -73,6 +73,44 @@ const confirm1 = (event,unit) => {
         }
     });
 };
+const addToMyUnits = (event,unit) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: `Add  ${unit.code} to your units?`,
+        icon: 'pi pi-check',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Add',
+            severity: 'success'
+        },
+        accept: () => {
+            // console.log(unit.code)
+            // unit.value.code = unit.value.code.toUpperCase()
+            axiosClient.post('/student/add-unit',unit)
+            .then(res=>{
+                
+                if(res.data.message == 'Unit already exists'){
+                    toast.add({severity:'warn',summary:unit.name + " !!",detail:'Unit already exists in your units',life:5000});
+                    return;
+                }
+                toast.removeAllGroups()
+                show(unit.name)
+                useUserStore().setUser(res.data.student)
+            })
+            .catch(err=>{
+                console.error(err)
+            })
+            // toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted the removed action', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'warn', summary: 'Rejected', detail: 'Unit not added', life: 3000 });
+        }
+    });
+};
 </script>
 <template>
     <ConfirmPopup></ConfirmPopup>
@@ -117,15 +155,25 @@ const confirm1 = (event,unit) => {
             </div>
         </div>
         <Divider></Divider>
+        <div class="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+            <div v-for="unit in unitList" :key="n" class="bg-gray-200 p-4 rounded-lg shadow-md text-center">
+                <div class="h-3/4">
+                    <p class="font-bold">{{ unit.name }}</p>
+                    <p class="font-bold">{{ unit.code }}</p>
+                </div>
+                <Button class="w-3/4  text-sm h-fit" @click="addToMyUnits($event,unit)" > <i class="pi pi-plus"></i>Add unit </Button>
+            </div>
+        </div>
+        <Divider></Divider>
         <div class="flex justify-between items-center">
             <div class="my-5 md:w-3/4 text-center font-bold text-xl font-serif">
-                U N I T S
+                <span>Y O U R &nbsp;&nbsp;  U N I T S</span>
             </div>
-            <div class="md:w-1/4">
+            <!-- <div class="md:w-1/4">
                 <Button severity="success" @click="visible = true" class="h-fit text-nowrap">
                     <i class="pi pi-plus"></i> Add Unit
                 </Button>
-            </div>
+            </div> -->
         </div>
         <div class="grid sm:grid-cols-4  gap-5 text-center">
          <div v-for="item in student.units" :key="item.id" class="bg-slate-600 cursor-pointer rounded-xl shadow-lg p-3 text-white ">
@@ -137,7 +185,7 @@ const confirm1 = (event,unit) => {
             <p>By. {{item.lecturer.name}}</p>
          </div>
         </div>
-        <Dialog v-model:visible="visible" modal header="Add your unit" :style="{ width: '25rem' }">
+        <!-- <Dialog v-model:visible="visible" modal header="Add your unit" :style="{ width: '25rem' }">
         <span class="text-surface-500 dark:text-surface-400 block ">Update your units.</span>
         <span class="text-xs mb-8">remember it must be unit that has a lecturer</span>
         <form @submit.prevent="addUnit">
@@ -154,7 +202,7 @@ const confirm1 = (event,unit) => {
                 <Button type="submit" label="Save" ></Button>
             </div>
         </form>
-    </Dialog>
+    </Dialog> -->
     </div>
 </template>
 
