@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('regNo')->unique();
             $table->string('idNo');
-            $table->unsignedBigInteger('facials')->nullable();
+            // $table->unsignedBigInteger('facials')->nullable();
             $table->unsignedBigInteger('faculty');
             $table->unsignedBigInteger('department');
             $table->unsignedBigInteger('course');
