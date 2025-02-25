@@ -10,6 +10,7 @@ globalThis.structuredClone = globalThis.structuredClone || (obj => JSON.parse(JS
 export default defineConfig({
   plugins: [
     vue(),
+    vueDevTools(),
   ],
   resolve: {
     alias: {
