@@ -16,20 +16,21 @@ use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
-    
+
     /**
      * registering students
      */
-    function create(Request $request){
+    function create(Request $request)
+    {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'regNo' => ['required', 'string', 'max:255','unique:'.Student::class],
-            'idNo' => ['required', 'string', 'max:255','unique:'.Student::class],
+            'regNo' => ['required', 'string', 'max:255', 'unique:' . Student::class],
+            'idNo' => ['required', 'string', 'max:255', 'unique:' . Student::class],
             'faculty' => ['required'],
             'department' => ['required'],
             'course' => ['required'],
         ]);
-        
+
         $data = Student::create([
             'name' => $request->name,
             'regNo' => $request->regNo,
@@ -51,110 +52,114 @@ class StudentController extends Controller
         ];
         return response()->json([
             'student' => $student
-        ],200);
+        ], 200);
     }
 
     /**
-     * get student for facial data
+     * get student for facial data registration
      */
-    function student(Request $request){
-        logger()->info($request);
+    function student(Request $request)
+    {
         $request->validate([
             'registrationNumber' => ['required']
         ]);
 
-        $stude = Student::where('regNo',$request->registrationNumber)
-                ->get()
-                ->map(function ($student){
-                    return [
-                        'regNo'=>$student->regNo,
-                        'name'=> $student->name,
-                        'faculty'=> $student->faculty,
-                        'department'=> $student->department,
-                        'course'=> $student->course,
-                    ];
-                })->first();
+        $stude = Student::where('regNo', $request->registrationNumber)
+            ->get()
+            ->map(function ($student) {
+                return [
+                    'regNo' => $student->regNo,
+                    'name' => $student->name,
+                    'faculty' => $student->faculty,
+                    'department' => $student->department,
+                    'course' => $student->course,
+                    'facials' => $student->facials == null ? null : $student->facials->descriptors
+                ];
+            })->first();
 
         return response()->json([
             'student' => $stude
         ]);
-
     }
 
     /**
-     * upadting facial data
+     * upadating facial data
      */
-    function facials(Request $request){
+    function facials(Request $request)
+    {
         $request->validate([
             'facials' => ['required'],
             'student' => ['required'],
         ]);
         logger()->info(json_encode($request->facials));
-        $student = Student::where('regNo',$request->student['regNo'])->get()->first();
+        $student = Student::where('regNo', $request->student['regNo'])->get()->first();
         $data = Facial::create([
             'student' => $student->regNo,
             'descriptors' => json_encode($request->facials)
         ]);
-    
+
         return response()->json([
             'data' => $data,
             'message' => "updated sucessfully"
         ]);
-
-
     }
 
     /**
      * class attendance history
      */
-    function history(){
-        $res = Attendance::where('student',Auth::user()->regNo)
+    function history()
+    {
+        $res = Attendance::where('student', Auth::user()->regNo)
+            ->get()
+            ->map(function ($data) {
+                return [
+                    'id' => $data->id,
+                    'lecture' => Lecture::where('id', $data->lecture)
                         ->get()
-                        ->map(function($data){
+                        ->map(function ($lecture) {
                             return [
-                                'id'=>$data->id,
-                                'lecture'=>Lecture::where('id',$data->lecture)
-                                                ->get()
-                                                ->map(function($lecture){
-                                                    return [
-                                                        'id' => $lecture->id,
-                                                        'lecturer' => $lecture->lecturer,
-                                                        'venue' => $lecture->venue,
-                                                        'time' => $lecture->time,
-                                                        'unit' => Unit::where('id',$lecture->unit)
-                                                                        ->get()->map(function($unit){
-                                                                            return [
-                                                                                'id' =>  $unit->id,
-                                                                                'code' =>  $unit->code,
-                                                                                'count' =>  $unit->count,
-                                                                                'course' =>  $unit->course,
-                                                                                'name' =>  $unit->name,
-                                                                                'lecturer' =>  $unit->lecturer,
-                                                                            ];
-                                                                        }),
-                                                        // 'id' => $lecture->unit(),
-                                                    ];
-                                                }),
-                                'clockIn'=>$data->clockIn,
+                                'id' => $lecture->id,
+                                'lecturer' => $lecture->lecturer,
+                                'venue' => $lecture->venue,
+                                'time' => $lecture->time,
+                                'unit' => Unit::where('id', $lecture->unit)
+                                    ->get()->map(function ($unit) {
+                                        return [
+                                            'id' =>  $unit->id,
+                                            'code' =>  $unit->code,
+                                            'count' =>  $unit->count,
+                                            'course' =>  $unit->course,
+                                            'name' =>  $unit->name,
+                                            'lecturer' =>  $unit->lecturer,
+                                        ];
+                                    }),
+                                // 'id' => $lecture->unit(),
                             ];
-                        });
+                        }),
+                    'clockIn' => $data->clockIn,
+                ];
+            });
         return $res;
     }
 
     /**
      * add unit
      */
-    function addUnit(Request $request){
+    function addUnit(Request $request)
+    {
         $request->validate([
-            'code' =>'required',
-            'name' =>'required',
+            'code' => 'required',
+            'name' => 'required',
         ]);
-        $units = Student::where('regNo',Auth::user()->regNo)->get('units')[0];
+        $units = Student::where('regNo', Auth::user()->regNo)->get('units')[0];
+        if (in_array($request['code'], json_decode($units->units))) {
+            return response()->json(['message' => 'Unit already exists'], 200);
+        }
         $data = json_decode($units->units);
         $data[] = $request['code'];
-        $response = Student::where('regNo',Auth::user()->regNo)->update(['units'=>$data]);
-        if($response == 1){
-            $user = Student::where('regNo',Auth::user()->regNo)->get()[0];
+        $response = Student::where('regNo', Auth::user()->regNo)->update(['units' => $data]);
+        if ($response == 1) {
+            $user = Student::where('regNo', Auth::user()->regNo)->get()[0];
             return response()->json([
                 'student' => [
                     'id' => $user->id,
@@ -164,18 +169,18 @@ class StudentController extends Controller
                     'department' => $user->department,
                     'faculty' => $user->faculty,
                     'course' => $user->course,
-                    'units' => (function($user){
-                        $codes = json_decode($user->units,true);
+                    'units' => (function ($user) {
+                        $codes = json_decode($user->units, true);
                         $units = [];
                         foreach ($codes as $code) {
                             // add the units to the units array
-                            $unit = \App\Models\Unit::where('code',$code)->first();
-                            if($unit){
+                            $unit = \App\Models\Unit::where('code', $code)->first();
+                            if ($unit) {
                                 $units[] = [
                                     'name' => $unit->name,
                                     'code' => $unit->code,
                                     'count' => $unit->count,
-                                    'lecturer' => Lecturer::where('staffNo',$unit->lecturer)->get('name')[0],
+                                    'lecturer' => Lecturer::where('staffNo', $unit->lecturer)->get('name')[0],
                                 ];
                             }
                         }
@@ -183,7 +188,7 @@ class StudentController extends Controller
                     })($user),
                 ]
             ]);
-        }else{
+        } else {
             return response(200);
         }
     }
@@ -191,17 +196,18 @@ class StudentController extends Controller
     /**
      * remove unit
      */
-    function removeUnit(Request $request){
+    function removeUnit(Request $request)
+    {
         $request->validate([
-            'code' =>'required',
+            'code' => 'required',
         ]);
-        $units = Student::where('regNo',Auth::user()->regNo)->get('units')[0];
+        $units = Student::where('regNo', Auth::user()->regNo)->get('units')[0];
         $data = json_decode($units->units);
-        $data = array_values(array_diff($data,[$request->code]));
-        $response = Student::where('regNo',Auth::user()->regNo)->update(['units'=>$data]);
+        $data = array_values(array_diff($data, [$request->code]));
+        $response = Student::where('regNo', Auth::user()->regNo)->update(['units' => $data]);
 
-        if($response == 1){
-            $user = $user = Student::where('regNo',Auth::user()->regNo)->get()[0];
+        if ($response == 1) {
+            $user = $user = Student::where('regNo', Auth::user()->regNo)->get()[0];
             return response()->json([
                 'student' => [
                     'id' => $user->id,
@@ -211,18 +217,18 @@ class StudentController extends Controller
                     'department' => $user->department,
                     'faculty' => $user->faculty,
                     'course' => $user->course,
-                    'units' => (function($user){
-                        $codes = json_decode($user->units,true);
+                    'units' => (function ($user) {
+                        $codes = json_decode($user->units, true);
                         $units = [];
                         foreach ($codes as $code) {
                             // add the units to the units array
-                            $unit = \App\Models\Unit::where('code',$code)->first();
-                            if($unit){
+                            $unit = \App\Models\Unit::where('code', $code)->first();
+                            if ($unit) {
                                 $units[] = [
                                     'name' => $unit->name,
                                     'code' => $unit->code,
                                     'count' => $unit->count,
-                                    'lecturer' => Lecturer::where('staffNo',$unit->lecturer)->get('name')[0],
+                                    'lecturer' => Lecturer::where('staffNo', $unit->lecturer)->get('name')[0],
                                 ];
                             }
                         }
@@ -230,7 +236,7 @@ class StudentController extends Controller
                     })($user),
                 ]
             ]);
-        }else{
+        } else {
             return response(200);
         }
     }
@@ -238,9 +244,13 @@ class StudentController extends Controller
     /**
      * student data
      */
-    function studentData(){
+    function studentData()
+    {
         $user = Auth::user();
         return response()->json([
+            'unitList' => Unit::where('faculty', $user->faculty)->where('department', $user->department)->where('course', $user->course)->get()->map(function ($data) {
+                return ['id' => $data->id, 'name' => $data->name, 'code' => $data->code,];
+            }),
             'student' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -249,24 +259,24 @@ class StudentController extends Controller
                 'department' => $user->department,
                 'faculty' => $user->faculty,
                 'course' => $user->course,
-                'units' => (function($user){
-                    $codes = json_decode($user->units,true);
+                'units' => (function ($user) {
+                    $codes = json_decode($user->units, true);
                     $units = [];
                     foreach ($codes as $code) {
                         // add the units to the units array
-                        $unit = \App\Models\Unit::where('code',$code)->first();
-                        if($unit){
+                        $unit = \App\Models\Unit::where('code', $code)->first();
+                        if ($unit) {
                             $units[] = [
                                 'name' => $unit->name,
                                 'code' => $unit->code,
                                 'count' => $unit->count,
-                                'lecturer' => Lecturer::where('staffNo',$unit->lecturer)->get('name')[0],
+                                'lecturer' => Lecturer::where('staffNo', $unit->lecturer)->get('name')[0],
                             ];
                         }
                     }
                     return $units;
                 })($user),
             ]
-            ]);
+        ]);
     }
 }
