@@ -133,7 +133,10 @@
                         </TabPanels>
                     </Tabs>
                     <div class="flex w-full justify-center" v-if="successImages.length != 0 ">
-                        <Button @click="cleanData" class="w-3/4 my-5 " severity="info">CLEAN THE IMAGES</Button>
+                        <Button @click="cleanData" v-if="!isCleaningImages" class="w-3/4 my-5 " severity="info">CLEAN THE IMAGES</Button>
+                        <Button  v-else class="w-3/4 my-5 " severity="info">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="6" height="14" x="1" y="4" fill="currentColor"><animate id="svgSpinnersBarsFade0" fill="freeze" attributeName="opacity" begin="0;svgSpinnersBarsFade1.end-0.425s" dur="1.275s" values="1;0.2"/></rect><rect width="6" height="14" x="9" y="4" fill="currentColor" opacity="0.4"><animate fill="freeze" attributeName="opacity" begin="svgSpinnersBarsFade0.begin+0.255s" dur="1.275s" values="1;0.2"/></rect><rect width="6" height="14" x="17" y="4" fill="currentColor" opacity="0.3"><animate id="svgSpinnersBarsFade1" fill="freeze" attributeName="opacity" begin="svgSpinnersBarsFade0.begin+0.51s" dur="1.275s" values="1;0.2"/></rect></svg>
+                        </Button>
                     </div>
                 </div>
 
@@ -183,6 +186,7 @@ const failedImages = ref([])
 const descriptions = ref([])
 const trainedData =  ref()
 const isTraining = ref(false)
+const isCleaningImages = ref(false)
 const isStep4 = ref(false)
 const student = ref({
     regNo:null,
@@ -209,6 +213,7 @@ const getStudent = ()=>{
         student.value.faculty = utils.getFacultyById(res.data.student.faculty)
         student.value.department = utils.getDepartmentById(res.data.student.faculty,res.data.student.department)
         student.value.course = utils.getCourseById(res.data.student.faculty,res.data.student.department,res.data.student.course)
+        student.value.facials = res.data.student.facials == null ? "Facail registration not done" : "Total images used: "+JSON.parse(res.data.student.facials).descriptors.length
         scrollToBottom()
     })
     .catch(err=>{
@@ -218,7 +223,7 @@ const getStudent = ()=>{
 }
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
-    alert('heh')
+  
     removeFileCallback(index);
     totalSize.value -= parseInt(formatSize(file.size));
     totalSizePercent.value = totalSize.value / 10;
@@ -327,6 +332,7 @@ const trainModel = async()=>{
 }
 
 const cleanData = async()=>{
+    isCleaningImages.value = true
     toast.removeAllGroups()
     update('info','CONFIRMATION','Image cofirmation in progress . . .')
     let index = 0
@@ -364,11 +370,12 @@ const cleanData = async()=>{
                 }
             })
             toast.removeAllGroups()
-            update('success','SUCCESS','Image confirmation Done!')
+            // update('success','SUCCESS','Image confirmation Done!')
             scrollToBottom()
             setTimeout(()=>{
                 toast.removeAllGroups()
                 update('info','FINAL STEP','Press the "ALL GOOD👍✨" button to save the data')
+                isCleaningImages.value = false
             },1000)
         }else{
             toast.add({severity:"error",summary:"IMAGES ERROR",detail:"your images have different faces making it not suitable for a good model",life:7000})
@@ -399,6 +406,7 @@ const uploadData = ()=>{
         student.value.faculty = null
         student.value.department = null
         student.value.course = null
+        toast.removeAllGroups()
         toast.add({severity:'success',summary:'REGISTRATION DONE!',detail:'Student is enrolled',life:5000,closable:false})
     })
     .catch(err=>{
