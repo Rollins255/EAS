@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Facial;
 use App\Models\Lecture;
 use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\Unit;
+use App\Services\AttendanceServices;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,6 +21,11 @@ use function PHPUnit\Framework\isEmpty;
 
 class AdminController extends Controller
 {
+    // public $attendanceServices;
+    // public function __construct(AttendanceServices $attendanceServices)
+    // {
+    //     $this->attendanceServices = $attendanceServices;
+    // }
     /**
      * Register  a lecturer
      */
@@ -209,6 +220,7 @@ class AdminController extends Controller
         $unit_data = Lecture::where('unit',$unit_id->id)
                             ->get()
                             ->map(function($data) use($students){
+                                
                                 return [
                                     'id' => $data->id,
                                     'lecturer' => $data->lecturer,
@@ -228,8 +240,7 @@ class AdminController extends Controller
                                                         ];
                                                     })
                                 ];
-                            })
-                            ;
+                            });
 
         // logger()->info(sizeof($unit_data) == 0? 'true':"false");
         // $unit_students = Student::whereJsonContains('units',$code)->count();
@@ -241,5 +252,89 @@ class AdminController extends Controller
             // 'attendance' => $unit_attendance,
         ]);
 
+    }
+    
+
+    public function generatePDF()
+    {
+        $info = Lecture::where('id',request('data')['id'])->value('unit');
+        $data = [
+            'faculty' => Unit::where('id',$info)->value('faculty'),
+            'department' => Unit::where('id',$info)->value('department'),
+            'course' => Unit::where('id',$info)->value('course'),
+            'unitCode' => Unit::where('id',$info)->value('code'),
+            'lecture' => request('data')['id'],
+        ];
+        
+        $students = Student::where('faculty',$data['faculty'])
+        ->where('department',$data['department'])
+        ->where('course',$data['course'])
+        ->whereJsonContains('units',$data['unitCode'])
+        ->get()
+        ->map(function($student) use($data){
+            return [
+                'id'=> $student->id,
+                'name'=> $student->name,
+                'regNo'=> $student->regNo,
+                'present'=> Attendance::where('lecture',$data['lecture'])->where('student',$student->regNo)->first() == null ? false : true,
+                'clockIn'=> Attendance::where('lecture',$data['lecture'])->where('student',$student->regNo)->first() == null 
+                            ?'-- --' 
+                            : Attendance::where('lecture', $data['lecture'])->where('student', $student->regNo)->first()->clockIn,
+            ];
+        });
+        $total_students = Student::whereJsonContains('units',$data['unitCode'])->count();
+        $lecture = Lecture::where('id',$data['lecture'])
+            ->get()
+            ->map(function($u_data) use($total_students){
+                return [
+                    'id' => $u_data->id,
+                    'lecturer_name' => Lecturer::where('staffNo',$u_data->lecturer)->value('name'),
+                    'lecturer_staffNo' => Lecturer::where('staffNo',$u_data->lecturer)->value('staffNo'),
+                    'venue' => $u_data->venue,
+                    'time' => $u_data->time,
+                    'students' => $total_students,
+                    'attendance' => Attendance::where('lecture',$u_data->id)->count(),
+                ];
+            });
+        $unit = Unit::where('code',$data['unitCode'])->get()->map(function($data){
+            return [
+                'name'=>$data->name,
+                'code'=>$data->code,
+            ];
+        });
+        logger()->info($lecture);
+        $data = [
+            'lecture' => $lecture,
+            'unit' => $unit,
+            'students' => $students
+        ];
+
+       
+        $pdf = Pdf::loadView('pdf.document',['data' => $data]);
+        $pdf->setPaper('A4','portrait');
+        return $pdf->download("pdf_name");
+    }
+
+    public function download()
+    {
+         // Sample data (replace with your actual data)
+         $data = [
+            'title' => 'Welcome to PDF Generation',
+            'content' => 'This is some sample content for the PDF.',
+            'items' => [
+                ['name' => 'Item 1', 'price' => 10.99],
+                ['name' => 'Item 2', 'price' => 20.49],
+                ['name' => 'Item 3', 'price' => 15.75],
+            ],
+        ];
+
+        // Load the view and pass data
+        $pdf = Pdf::loadView('pdf.document', $data); // 'pdf.document' is your blade view
+
+        // Optional: Customize PDF settings
+        $pdf->setPaper('A4', 'portrait'); // Example: A4 portrait
+
+        // Return the PDF as a download
+        return $pdf->download('document.pdf');
     }
 }
