@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use function PHPUnit\Framework\isEmpty;
 
 class LectureController extends Controller
-{
+{ 
     /**
      * create a lecture
      */
@@ -96,10 +96,6 @@ class LectureController extends Controller
      * getting students for a lecture
      */
     function start(Request $request){
-        // $data =  Student::where('faculty',$request->faculty)
-        //                 ->where('department',$request->department)
-        //                 ->where('course',$request->course)->get();
-        // logger()->info($re);
         $students = Student::where('faculty',$request->faculty)
                             ->where('department',$request->department)
                             ->where('course',$request->course)
