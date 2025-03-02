@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -253,7 +254,43 @@ class AdminController extends Controller
         ]);
 
     }
-    
+
+    /**
+     * generate a summary of attendance in pdf format for a specific unit
+     */
+    public function generalSummary(){
+        $unit = Unit::where('code',request('unit'))->first();
+        $students = Student::whereJsonContains('units',request('unit'))->get()->map(function($data)use ($unit){
+            return [
+                'name' =>$data->name,
+                'regNo' =>$data->regNo,
+                // 'lectures' => Attendance::where('student',$data->regNo)->value('lecture'),
+                'lectures' => Lecture::where('unit',$unit->id)->get()->map(function($unit_data) use($data){
+                    return [
+                        'id' => $unit_data->id,
+                        'attended' => (Attendance::where('lecture',$unit_data->id)->where('student',$data->regNo)->get())->isNotEmpty() ? true : false,
+                    ];
+                }),
+            ];
+        });    
+        // logger()->info($students);
+        // $pdf = Pdf::loadView('pdf.unitReport',compact($students));
+        $pdf_file = Pdf::loadView('pdf.test');
+        $pdf_file->setPaper('A4','portrait');
+        return $pdf_file->download("unit summary");
+        // try {
+        //     $pdf = App::make('dompdf.wrapper');
+        //     $pdf->loadHTML('<h1>Test</h1>');
+        //     return $pdf->stream();
+        // } catch (\Exception $e) {
+        //     Log::error('Dompdf Error: ' . $e->getMessage());
+        //     return 'Error generating PDF. Check logs.';
+        // }
+    }
+
+    /**
+     * generate a summary of attendance in  pdf for a specific lecture 
+     */
 
     public function generatePDF()
     {
@@ -302,7 +339,6 @@ class AdminController extends Controller
                 'code'=>$data->code,
             ];
         });
-        logger()->info($lecture);
         $data = [
             'lecture' => $lecture,
             'unit' => $unit,

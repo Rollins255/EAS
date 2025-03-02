@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/unit-info/{staffNo}/{code}',[AdminController::class,'unitInfo']);
 
     Route::post('/download',[AdminController::class,'generatePDF']);
+    Route::post('/download/general-summary',[AdminController::class,'generalSummary']);
 });
 
 

@@ -1,10 +1,11 @@
 <template>
 <nav-bar></nav-bar> 
-<div>
+<div class="flex justify-around">
     <div class="grid md:grid-cols-2 md:w-3/4 md:mx-auto py-5">
         <p class="font-bold font-serif">UNIT NAME: <span class="font-thin">{{ route.query.unit.toUpperCase()}}</span></p>
         <p class="font-bold font-serif">UNIT CODE: <span  class="font-thin">{{ route.query.code.toUpperCase()}}</span></p>
     </div>
+    <Button severity="info" @click="generalSummary(route.query.code.toUpperCase())" outlined class="h-fit bg-red-400 m-auto font-bold"> <i class="pi pi-download"></i> Summary</Button>
 </div>
 <div class="card md:w-3/4 md:mx-auto">
     <DataTable :value="data" size="small" showGridlines stripedRows  >
@@ -31,7 +32,7 @@
 
 <script setup>
 import axiosClient from '@/axios/axios';
-import { DataTable,Column,Tag } from 'primevue';
+import { DataTable,Column,Tag,Button } from 'primevue';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 let data = ref([])
@@ -62,7 +63,6 @@ const download = (data)=>{
     lecture.value = data
     axiosClient.post('/download',{data}, { responseType: 'blob' })
     .then(res=>{
-        console.log(res.data)
         const blob = new Blob([res.data], { type: 'application/pdf' }); // Assuming PDF
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
@@ -74,6 +74,25 @@ const download = (data)=>{
     .catch(err=>{
         isDownloading.value = false
         lecture.value = null
+        console.error(err)
+    })
+}
+
+const generalSummary = (unit)=>{
+    axiosClient.post('/download/general-summary',{unit})
+    .then(res=>{
+        console.log(res)
+        const blob = new Blob([res.data], { type: 'application/pdf' }); // Assuming PDF
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = encodeURIComponent(route.query.unit + " " + route.query.code.toUpperCase()) + ".pdf";
+        // link.download = route.query.unit +" "+route.query.code.toUpperCase(); // Or make it dynamic
+        link.click();
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(link)
+
+    })
+    .catch(err=>{
         console.error(err)
     })
 }
