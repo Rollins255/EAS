@@ -13,14 +13,14 @@
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #7CB9E8;
         }
     </style>
 </head>
 <body>
-    <h1>{{$data['unit'][0]['name']}} summary</h1>
+    <h1>{{$data['unit'][0]['name']}}</h1>
+    <h3>Lecture Summary</h3>
     @if(count($data['lecture']) > 0)
-        <h3>Lecture information</h3>
         <table>
             <thead>
                 <tr>

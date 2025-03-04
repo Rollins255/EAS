@@ -79,17 +79,18 @@ const download = (data)=>{
 }
 
 const generalSummary = (unit)=>{
-    axiosClient.post('/download/general-summary',{unit})
+    axiosClient.post('/download/general-summary',{unit},{ responseType: 'blob' })
     .then(res=>{
         console.log(res)
         const blob = new Blob([res.data], { type: 'application/pdf' }); // Assuming PDF
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = encodeURIComponent(route.query.unit + " " + route.query.code.toUpperCase()) + ".pdf";
+        link.download = "summary.pdf";
+        // link.download = encodeURIComponent(route.query.unit + " " + route.query.code.toUpperCase()) + ".pdf";
         // link.download = route.query.unit +" "+route.query.code.toUpperCase(); // Or make it dynamic
         link.click();
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(link)
+        // window.URL.revokeObjectURL(url)
+        // document.body.removeChild(link)
 
     })
     .catch(err=>{

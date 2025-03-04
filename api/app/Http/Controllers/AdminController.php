@@ -260,6 +260,15 @@ class AdminController extends Controller
      */
     public function generalSummary(){
         $unit = Unit::where('code',request('unit'))->first();
+        $lecturer = Lecture::where('unit',$unit->id)->value('lecturer');
+        $lecturer = Lecturer::where('staffNo',$lecturer)->get()->map(function($data){
+            return [
+                'name' => $data->name,
+                'staffNo' => $data->staffNo,
+                'idNo' => $data->idNo,
+                'email' => $data->email,
+            ];
+        });
         $students = Student::whereJsonContains('units',request('unit'))->get()->map(function($data)use ($unit){
             return [
                 'name' =>$data->name,
@@ -273,19 +282,16 @@ class AdminController extends Controller
                 }),
             ];
         });    
-        // logger()->info($students);
-        // $pdf = Pdf::loadView('pdf.unitReport',compact($students));
-        $pdf_file = Pdf::loadView('pdf.test');
-        $pdf_file->setPaper('A4','portrait');
-        return $pdf_file->download("unit summary");
-        // try {
-        //     $pdf = App::make('dompdf.wrapper');
-        //     $pdf->loadHTML('<h1>Test</h1>');
-        //     return $pdf->stream();
-        // } catch (\Exception $e) {
-        //     Log::error('Dompdf Error: ' . $e->getMessage());
-        //     return 'Error generating PDF. Check logs.';
-        // }
+        Log::info($lecturer);
+        $data = [
+            'students' =>$students,
+            'unit' => $unit,
+            'lecturer' => $lecturer,
+        ];
+        $pdf = Pdf::loadView('pdf.unitReport',['data' => $data]);
+        $pdf->setPaper('A4', 'landscape');
+        // $pdf->setPaper('A4','portrait');
+        return $pdf->stream("unit summary");
     }
 
     /**
