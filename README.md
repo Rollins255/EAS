@@ -1,6 +1,6 @@
-# class_attendace_system
+# CLASS ATTENDANCE SYSTEM
 
-This template should help get you started developing with Vue 3 in Vite.
+This a refined class attendance system where checkin are made through facial recognition.
 
 ## Recommended IDE Setup
 
