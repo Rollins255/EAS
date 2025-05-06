@@ -1,15 +1,16 @@
 <?php
+class Department {
+    private $db;
+    
+    public function __construct($db) {
+        $this->db = $db;
+    }
 
-namespace App\Models;
+    public function getAllDepartments() {
+        $stmt = $this->db->query("SELECT * FROM departments");
+        return $stmt->fetchAll();
+    }
 
-use Illuminate\Database\Eloquent\Model;
-
-class Course extends Model
-{
-    //
-    protected $fillable = [
-        'name',
-        'faculty',
-        'department',
-    ];
+    // Add other department-related methods
 }
+?>
